@@ -15,16 +15,17 @@ export default class InfoMarker extends Component {
 
     handleToggleOpen = () => {
 
-        this.setState({
-            isOpen: true
-        });
+        // this.setState({
+        //     isOpen: true
+        // });
+        this.props.setMarkerInfoWindow(this.props.index)
     }
 
     handleToggleClose = () => {
 
-        this.setState({
-            isOpen: false
-        });
+        // this.setState({
+        //     isOpen: false
+        // });
     }
 
 
@@ -38,7 +39,7 @@ export default class InfoMarker extends Component {
                     label={this.props.index.toString()}
                     onClick={() => this.handleToggleOpen()}
                 >
-                    {this.state.isOpen &&
+                    {/* {this.state.isOpen &&
                         <InfoWindow
                             // onLoad={console.log(this.props.address)}
                             position={{ lat: this.props.lat, lng: this.props.lng }}
@@ -62,7 +63,7 @@ export default class InfoMarker extends Component {
                                 </div>
                             </div>
 
-                        </InfoWindow>}
+                        </InfoWindow>} */}
                 </Marker>
 
             </Fragment>

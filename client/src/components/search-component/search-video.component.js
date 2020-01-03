@@ -49,7 +49,12 @@ export default class Homepage extends PureComponent {
             radiusSize: 2000,
             isToggled: false,
             renderCircle: false,
-            radius: 0
+            radius: 0,
+            markerAddress: 'None',
+            markerLat: 'None',
+            markerLng: 'None',
+            markerDateFrom: 'None',
+            markerDateTo: 'None'
         };
 
         this.handleRadiusChange = this.handleRadiusChange.bind(this)
@@ -296,6 +301,18 @@ export default class Homepage extends PureComponent {
 
     }
 
+    setMarkerInfoWindow = markerIndex => {
+        let marker = this.state.videolist[markerIndex]
+        let dateFrom = convertStringToDate(marker[0].date)
+        let dateTo = convertStringToDate(marker[marker.length - 1].date)
+
+        this.setState({ markerAddress: this.state.geoAddress[markerIndex] });
+        this.setState({ markerLat: marker[0].lat });
+        this.setState({ markerLng: marker[0].lon });
+        this.setState({ markerDateFrom: dateFrom });
+        this.setState({ markerDateTo: dateTo });
+    };
+
     renderInfoMarkers = () => {
 
         return (this.state.videolist.map((data, index) => {
@@ -307,10 +324,7 @@ export default class Homepage extends PureComponent {
                 index={index}
                 lat={parseFloat(data[0].lat)}
                 lng={parseFloat(data[0].lon)}
-                label={index}
-                address={this.state.geoAddress[index]}
-                dateFrom={dateFrom}
-                dateTo={dateTo}
+                setMarkerInfoWindow={this.setMarkerInfoWindow}
             />))
         }))
 
@@ -452,6 +466,21 @@ export default class Homepage extends PureComponent {
                         <div className="searchControls">
                             {this.renderRedirect()}
                             <button type="button" className="btn btn-success" onClick={this.checkInsideCirle}>Search</button>
+                        </div>
+
+                        <div className="markerInfo">
+                            <div>
+                                <p>{'Address: ' + this.state.markerAddress}</p>
+                            </div>
+                            <div>
+                                <p> {'Coordinates: ' + this.state.markerLat + ', ' + this.state.markerLng}</p>
+                            </div>
+                            <div>
+                                <p> {'From: ' + this.state.markerDateFrom}</p>
+                            </div>
+                            <div>
+                                <p> {'To: ' + this.state.markerDateTo}</p>
+                            </div>
                         </div>
 
                     </div>
