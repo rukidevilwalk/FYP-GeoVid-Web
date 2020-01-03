@@ -1,0 +1,39 @@
+{
+	"name": "geovid",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.js",
+	"scripts": {
+		"server": "nodemon server.js",
+		"client": "concurrently \"cd client && npm run start \"",
+		"db": "concurrently \"mongod \"  \"mongo \"",
+		"dev": "concurrently \"cd client && npm run start \" \"npm run server\" ",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@react-google-maps/api": "^1.7.6",
+		"body-parser": "^1.19.0",
+		"concurrently": "^4.1.2",
+		"cors": "^2.8.5",
+		"crypto": "^1.0.1",
+		"express": "^4.17.1",
+		"gridfs-stream": "^1.1.1",
+		"hls.js": "^0.12.4",
+		"method-override": "^3.0.0",
+		"mongodb": "^3.3.0",
+		"mongoose": "^5.6.9",
+		"morgan": "^1.9.1",
+		"multer": "^1.4.2",
+		"multer-gridfs-storage": "^3.3.0",
+		"nodemon": "^1.19.2",
+		"react": "^16.9.0",
+		"react-datetime-picker": "^2.7.1",
+		"react-dom": "^16.9.0",
+		"react-geocode": "^0.2.0",
+		"react-places-autocomplete": "^7.2.1",
+		"video.js": "^7.6.5"
+	}
+}

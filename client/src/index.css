@@ -1,0 +1,42 @@
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+		"Droid Sans", "Helvetica Neue", sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+#SearchMap {
+	height: 600px;
+}
+
+.searchControls {
+	padding-bottom: 10%;
+	margin: 1.5%;
+}
+
+.search-controls-datetimepicker {
+	padding-bottom: 10%;
+	margin: 1.5%;
+}
+
+.Demo__search-bar-container {
+	float: left;
+	position: relative;
+	background: none repeat scroll 0 0 #ffffff;
+	z-index: 99999;
+}
+
+.Demo__autocomplete-container {
+	background: none repeat scroll 0 0 #ffffff;
+	position: absolute;
+
+	left: 0;
+	top: 100%;
+	width: 150%;
+	transition: height 1s ease;
+}
