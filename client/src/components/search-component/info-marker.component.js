@@ -9,7 +9,9 @@ export default class InfoMarker extends Component {
         super(props);
 
         this.state = {
-            isOpen: false
+            isOpen: false,
+            isSelected: false,
+            iconURL: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
         }
     }
 
@@ -19,6 +21,11 @@ export default class InfoMarker extends Component {
         //     isOpen: true
         // });
         this.props.setMarkerInfoWindow(this.props.index)
+
+        if (this.state.iconURL == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+            this.setState({ iconURL: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' })
+        else
+            this.setState({ iconURL: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' })
     }
 
     handleToggleClose = () => {
@@ -28,6 +35,9 @@ export default class InfoMarker extends Component {
         // });
     }
 
+    handleToggleSelected = () => {
+
+    }
 
     render() {
 
@@ -36,8 +46,8 @@ export default class InfoMarker extends Component {
                 <Marker
                     key={this.props.index}
                     position={{ lat: this.props.lat, lng: this.props.lng }}
-                    label={this.props.index.toString()}
                     onClick={() => this.handleToggleOpen()}
+                    icon={this.state.iconURL} //Selected
                 >
                     {/* {this.state.isOpen &&
                         <InfoWindow

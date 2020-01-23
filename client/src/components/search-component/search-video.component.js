@@ -59,7 +59,7 @@ export default class Homepage extends PureComponent {
 
         this.handleRadiusChange = this.handleRadiusChange.bind(this)
     }
-
+    refsCollection = {};
 
     componentDidMount() {
 
@@ -163,14 +163,12 @@ export default class Homepage extends PureComponent {
         if (this.radius !== undefined) {
 
             if (this.radius.getRadius() > 12000) {
-                console.log('Radius not allowed to be over 12km')
 
-                this.setState({ radiusSize: 12000 })
+                this.radius.setRadius(12000)
 
             } else if (this.radius.getRadius() < 2000) {
-                console.log('Radius not allowed to be under 2km')
 
-                this.setState({ radiusSize: 2000 })
+                this.radius.setRadius(2000)
 
             } else {
                 this.setState({ radiusSize: parseInt(this.radius.getRadius()) })
@@ -189,21 +187,42 @@ export default class Homepage extends PureComponent {
     }
 
     checkInsideCirle = () => {
-        this.setState({ counter: 0 })
-        this.state.videolist.forEach((coords) => {
+        // this.setState({ counter: 0 })
+        // this.state.videolist.forEach((coords) => {
+
+        //     let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
+        //     let markerCoord = { lat: parseFloat(coords[0].lat), lon: parseFloat(coords[0].lon) }
+        //     let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
+        //     if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
+        //         this.setState((prevState, props) => ({
+        //             counter: prevState.counter + 1
+        //         }))
+        //         Geocode.fromLatLng(coords[0].lat, coords[0].lon).then((response) => {
+
+        //             return response.results[0].formatted_address
+
+        //         })
+        //             .then((response) => {
+        //                 this.setState((prevState) => {
+        //                     //return { selectedVideos: [...prevState.selectedVideos, [coords[0].filename, response, coords[0].date, coords[coords.length - 1].date, distanceBetweenMarker_Coord]] };
+        //                     return { selectedVideos: [...prevState.selectedVideos, [coords[0].filename]] };
+
+        //                 })
+
+        //             })
+
+        //     }
+        // })
+
+        this.state.videolist.forEach((coords, index) => {
 
             let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
             let markerCoord = { lat: parseFloat(coords[0].lat), lon: parseFloat(coords[0].lon) }
             let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
             if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
-                this.setState((prevState, props) => ({
-                    counter: prevState.counter + 1
-                }))
-                Geocode.fromLatLng(coords[0].lat, coords[0].lon).then((response) => {
 
-                    return response.results[0].formatted_address
+                this.refsCollection[index].handleToggleOpen()
 
-                })
                     .then((response) => {
                         this.setState((prevState) => {
                             //return { selectedVideos: [...prevState.selectedVideos, [coords[0].filename, response, coords[0].date, coords[coords.length - 1].date, distanceBetweenMarker_Coord]] };
@@ -322,6 +341,7 @@ export default class Homepage extends PureComponent {
             return (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo && (<InfoMarker
                 key={index}
                 index={index}
+                ref={instance => this.refsCollection[index] = instance}
                 lat={parseFloat(data[0].lat)}
                 lng={parseFloat(data[0].lon)}
                 setMarkerInfoWindow={this.setMarkerInfoWindow}
