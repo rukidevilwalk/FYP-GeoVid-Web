@@ -20,12 +20,18 @@ export default class InfoMarker extends Component {
         // this.setState({
         //     isOpen: true
         // });
+        console.log('selecting marker')
         this.props.setMarkerInfoWindow(this.props.index)
 
         if (this.state.iconURL == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png')
             this.setState({ iconURL: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' })
         else
             this.setState({ iconURL: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' })
+    }
+
+    handleSelectMarker = () => {
+
+        this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
     }
 
     handleToggleClose = () => {
@@ -47,6 +53,9 @@ export default class InfoMarker extends Component {
                     key={this.props.index}
                     position={{ lat: this.props.lat, lng: this.props.lng }}
                     onClick={() => this.handleToggleOpen()}
+                    onLoad={marker => {
+                        this.marker = marker;
+                    }}
                     icon={this.state.iconURL} //Selected
                 >
                     {/* {this.state.isOpen &&

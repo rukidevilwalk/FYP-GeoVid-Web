@@ -40,6 +40,8 @@ export default class Homepage extends PureComponent {
             isLoaded: false,
             address: '',
             errorMessage: '',
+            radiusLatitude: 0,
+            radiusLongitude: 0,
             latitude: 0,
             longitude: 0,
             isGeocoding: false,
@@ -57,7 +59,7 @@ export default class Homepage extends PureComponent {
             markerDateTo: 'None'
         };
 
-        this.handleRadiusChange = this.handleRadiusChange.bind(this)
+
     }
     refsCollection = {};
 
@@ -162,21 +164,28 @@ export default class Homepage extends PureComponent {
 
         if (this.radius !== undefined) {
 
-            if (this.radius.getRadius() > 12000) {
+            if (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()) {
+                console.log('handling radius change')
+                this.setState({
+                    latitude: this.radius.getCenter().lat(),
+                    longitude: this.radius.getCenter().lng()
+                })
 
-                this.radius.setRadius(12000)
+                if (this.radius.getRadius() > 12000) {
 
-            } else if (this.radius.getRadius() < 2000) {
+                    this.radius.setRadius(12000)
 
-                this.radius.setRadius(2000)
+                } else if (this.radius.getRadius() < 2000) {
 
-            } else {
-                this.setState({ radiusSize: parseInt(this.radius.getRadius()) })
+                    this.radius.setRadius(2000)
+
+                } else {
+                    // this.setState({ radiusSize: parseInt(this.radius.getRadius()) })
+                }
             }
-
         }
-
     }
+
 
     handleRadiusSlider = (event) => {
         if (this.radius !== undefined) {
@@ -186,7 +195,7 @@ export default class Homepage extends PureComponent {
 
     }
 
-    checkInsideCirle = () => {
+    checkInsideCirle = (event) => {
         // this.setState({ counter: 0 })
         // this.state.videolist.forEach((coords) => {
 
@@ -214,39 +223,50 @@ export default class Homepage extends PureComponent {
         //     }
         // })
 
-        this.state.videolist.forEach((coords, index) => {
 
-            let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
-            let markerCoord = { lat: parseFloat(coords[0].lat), lon: parseFloat(coords[0].lon) }
-            let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
-            if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
+        if (this.refsCollection != {}) {
+            console.log('Checking inside circle')
+            console.log(this.refsCollection)
+            this.state.videolist.forEach((data, index) => {
 
-                this.refsCollection[index].handleToggleOpen()
+                let dateFrom = convertStringToDate(data[0].date)
+                let dateTo = convertStringToDate(data[data.length - 1].date)
 
-                    .then((response) => {
-                        this.setState((prevState) => {
-                            //return { selectedVideos: [...prevState.selectedVideos, [coords[0].filename, response, coords[0].date, coords[coords.length - 1].date, distanceBetweenMarker_Coord]] };
-                            return { selectedVideos: [...prevState.selectedVideos, [coords[0].filename]] };
+                if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
 
-                        })
+                    let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
+                    let markerCoord = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
+                    let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
+                    if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
 
-                    })
+                        this.refsCollection[index].handleSelectMarker()
 
-            }
-        })
+                        // this.setState((prevState) => {
+                        //     return { selectedVideos: [...prevState.selectedVideos, [data[0].filename]] };
+                        // })
+
+                    }
+                }
+
+            })
+        }
+
+
     }
 
     renderRadiusByClick = (event) => {
         if (this.state.isToggled) {
             this.setState({
-                latitude: event.latLng.lat(),
-                longitude: event.latLng.lng()
+                radiusLatitude: event.latLng.lat(),
+                radiusLongitude: event.latLng.lng()
             })
 
 
             this.setState(prevState => ({
                 isToggled: !prevState.isToggled
             }))
+
+            this.checkInsideCirle()
         }
 
 
@@ -266,23 +286,22 @@ export default class Homepage extends PureComponent {
                 this.radius = radius;
             }}
             center={{
-                lat: this.state.latitude,
-                lng: this.state.longitude
+                lat: this.state.radiusLatitude,
+                lng: this.state.radiusLongitude
             }}
+            draggable={true}
             options={{
                 strokeColor: '#FF0000',
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
-
-                clickable: false,
-                draggable: false,
                 editable: true,
                 visible: true,
                 radius: this.state.radiusSize,
                 zIndex: 1
             }}
             onRadiusChanged={this.handleRadiusChange}
-
+            onCenterChanged={e => this.checkInsideCirle(e)}
+            onDragEnd={e => console.log('dragend')}
         />)
     }
 
