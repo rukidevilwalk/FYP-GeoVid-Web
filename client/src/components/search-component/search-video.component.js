@@ -61,7 +61,7 @@ export default class Homepage extends PureComponent {
 
 
     }
-    refsCollection = {};
+    refsCollection = [];
 
     componentDidMount() {
 
@@ -195,46 +195,20 @@ export default class Homepage extends PureComponent {
 
     }
 
-    checkInsideCirle = (event) => {
-        // this.setState({ counter: 0 })
-        // this.state.videolist.forEach((coords) => {
+    checkInsideCirle = () => {
 
-        //     let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
-        //     let markerCoord = { lat: parseFloat(coords[0].lat), lon: parseFloat(coords[0].lon) }
-        //     let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
-        //     if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
-        //         this.setState((prevState, props) => ({
-        //             counter: prevState.counter + 1
-        //         }))
-        //         Geocode.fromLatLng(coords[0].lat, coords[0].lon).then((response) => {
+        if (this.radius !== undefined && typeof this.refsCollection !== 'undefined') {
+            //  console.log('Checking inside circle1' + '\n' + this.refsCollection + '\n' + this.state.radiusLongitude + " " + this.state.radiusLatitude + " " + this.radius.getCenter().lat() + " " + this.radius.getCenter().lng())
 
-        //             return response.results[0].formatted_address
+            var checkRadius = false
 
-        //         })
-        //             .then((response) => {
-        //                 this.setState((prevState) => {
-        //                     //return { selectedVideos: [...prevState.selectedVideos, [coords[0].filename, response, coords[0].date, coords[coords.length - 1].date, distanceBetweenMarker_Coord]] };
-        //                     return { selectedVideos: [...prevState.selectedVideos, [coords[0].filename]] };
+            this.refsCollection.forEach(element => {
+                if (element != null)
+                    checkRadius = true;
+            });
 
-        //                 })
+            if (checkRadius && (this.state.isToggled || (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()))) {
 
-        //             })
-
-        //     }
-        // })
-
-        // if (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()) {
-        //     console.log('handling radius change')
-        //     this.setState({
-        //         latitude: this.radius.getCenter().lat(),
-        //         longitude: this.radius.getCenter().lng()
-        //     })
-
-        // }
-        if (this.radius !== undefined) {
-            if (this.refsCollection != {} && (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng())) {
-                console.log('Checking inside circle')
-                console.log(this.refsCollection)
                 this.state.videolist.forEach((data, index) => {
 
                     let dateFrom = convertStringToDate(data[0].date)
@@ -249,10 +223,6 @@ export default class Homepage extends PureComponent {
 
                             this.refsCollection[index].handleSelectMarker()
 
-                            // this.setState((prevState) => {
-                            //     return { selectedVideos: [...prevState.selectedVideos, [data[0].filename]] };
-                            // })
-
                         } else {
                             this.refsCollection[index].handleDeselectMarker()
                         }
@@ -260,6 +230,8 @@ export default class Homepage extends PureComponent {
 
                 })
             }
+        } else {
+            console.log('Circle not initialized')
         }
 
 
@@ -273,12 +245,13 @@ export default class Homepage extends PureComponent {
                 radiusLongitude: event.latLng.lng()
             })
 
+            this.checkInsideCirle()
 
             this.setState(prevState => ({
                 isToggled: !prevState.isToggled
             }))
 
-            this.checkInsideCirle()
+
         }
 
 
@@ -293,7 +266,7 @@ export default class Homepage extends PureComponent {
     }
 
     renderRadius = () => {
-        return (<Circle
+        return ((<Circle
             onLoad={radius => {
                 this.radius = radius;
             }}
@@ -312,9 +285,9 @@ export default class Homepage extends PureComponent {
                 zIndex: 1
             }}
             onRadiusChanged={this.handleRadiusChange}
-            onCenterChanged={e => this.checkInsideCirle(e)}
+            onCenterChanged={e => this.checkInsideCirle()}
             onDragEnd={e => console.log('dragend')}
-        />)
+        />))
     }
 
     // Map functions
