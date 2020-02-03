@@ -65,7 +65,6 @@ export default class VideoPlayer extends PureComponent {
 
 
   render() {
-    console.log('rendering videoplayer')
     return (
       <Fragment>
         {this.renderVideoPlayer()}

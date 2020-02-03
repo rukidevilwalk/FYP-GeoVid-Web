@@ -16,6 +16,8 @@ export default class InfoMarker extends Component {
         }
     }
 
+    filename = ''
+
     handleToggleOpen = () => {
 
         // this.setState({
@@ -27,6 +29,7 @@ export default class InfoMarker extends Component {
         if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
 
             this.handleDeselectMarker()
+            this.props.removeSelectedVideos(this.filename)
             this.setState({
                 pathVisible: false
             })
@@ -35,6 +38,7 @@ export default class InfoMarker extends Component {
         else {
 
             this.handleSelectMarker()
+            this.props.addSelectedVideos(this.filename)
             this.setState({
                 pathVisible: true
             })
@@ -43,17 +47,21 @@ export default class InfoMarker extends Component {
     }
 
     handleSelectMarker = () => {
+        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/red-dot.png') {
+            this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+        }
 
-        this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
 
     }
 
     handleDeselectMarker = () => {
+        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+            this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
+            this.setState({
+                pathVisible: false
+            })
+        }
 
-        this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
-        this.setState({
-            pathVisible: false
-        })
     }
 
     handleToggleClose = () => {
@@ -63,8 +71,9 @@ export default class InfoMarker extends Component {
         // });
     }
 
-    handleToggleSelected = () => {
-
+    init = (marker) => {
+        this.filename = this.props.filename
+        this.marker = marker;
     }
 
     render() {
@@ -77,7 +86,7 @@ export default class InfoMarker extends Component {
                     position={{ lat: this.props.lat, lng: this.props.lng }}
                     onClick={() => this.handleToggleOpen()}
                     onLoad={marker => {
-                        this.marker = marker;
+                        this.init(marker)
                     }}
                     icon={this.state.iconURL} //Selected
                 >

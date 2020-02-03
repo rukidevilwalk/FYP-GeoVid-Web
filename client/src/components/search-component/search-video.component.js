@@ -63,6 +63,8 @@ export default class Homepage extends PureComponent {
 
     }
     refsCollection = [];
+    selectedVideos = [];
+    urlString = ''
 
     componentDidMount() {
 
@@ -89,21 +91,20 @@ export default class Homepage extends PureComponent {
 
     renderRedirect = () => {
 
-        if (this.state.selectedVideos.length === this.state.counter && this.state.counter !== 0) {
 
-            let urlString = ''
+        this.urlString = ''
 
-            this.state.selectedVideos.forEach((url) => {
-                urlString += ('?' + url[0])
-            })
+        this.selectedVideos.forEach((url) => {
+            this.urlString += ('?' + url)
+        })
 
-            if (this.state.selectedVideos.length = 1)
-                urlString = urlString.substring(1)
+        if (this.selectedVideos.length = 1)
+            this.urlString = this.urlString.substring(1)
+        console.log(this.urlString)
+        this.setState({ redirect: true })
 
-            return <Redirect to={{
-                pathname: '/watch/' + urlString
-            }} />
-        }
+
+
     }
 
     //DateTime Picker fuctions
@@ -197,6 +198,21 @@ export default class Homepage extends PureComponent {
 
     }
 
+    removeSelectedVideos = (value) => {
+        console.log('Removing from selectedVideos:' + value)
+        this.selectedVideos = this.selectedVideos.filter(item => item !== value)
+
+    }
+
+    addSelectedVideos = (value) => {
+        if (!this.selectedVideos.includes(value)) {
+            console.log('Adding to selectedVideos:' + value)
+            this.selectedVideos.push(value)
+        }
+
+    }
+
+
     checkInsideCirle = () => {
 
         // Circle and markers must have been rendered
@@ -220,6 +236,7 @@ export default class Homepage extends PureComponent {
                 })
 
                 this.state.videolist.forEach((data, index) => {
+
                     coordInsideCircle = false
                     let dateFrom = convertStringToDate(data[0].date)
                     let dateTo = convertStringToDate(data[data.length - 1].date)
@@ -242,8 +259,10 @@ export default class Homepage extends PureComponent {
 
                         if (coordInsideCircle) {
                             this.refsCollection[index].handleSelectMarker()
+                            this.addSelectedVideos(data[0].filename)
                         } else {
                             this.refsCollection[index].handleDeselectMarker()
+                            this.removeSelectedVideos(data[0].filename)
                         }
 
                     }
@@ -365,6 +384,9 @@ export default class Homepage extends PureComponent {
             return (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo && (<InfoMarker
                 key={index}
                 index={index}
+                filename={data[0].filename}
+                removeSelectedVideos={this.removeSelectedVideos}
+                addSelectedVideos={this.addSelectedVideos}
                 ref={instance => this.refsCollection[index] = instance}
                 pathdata={this.state.markerPaths[index]}
                 lat={parseFloat(data[0].lat)}
@@ -512,8 +534,10 @@ export default class Homepage extends PureComponent {
                         </div>
 
                         <div className="searchControls">
-                            {this.renderRedirect()}
-                            <button type="button" className="btn btn-success" onClick={this.checkInsideCirle}>Search</button>
+                            {(this.state.redirect && <Redirect to={{
+                                pathname: '/watch/' + this.urlString
+                            }} />)}
+                            <button type="button" className="btn btn-success" onClick={this.renderRedirect}>Search</button>
                         </div>
 
                         <div className="markerInfo">
