@@ -34,6 +34,11 @@ export default class InfoMarker extends Component {
         this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
     }
 
+    handleDeselectMarker = () => {
+
+        this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
+    }
+
     handleToggleClose = () => {
 
         // this.setState({

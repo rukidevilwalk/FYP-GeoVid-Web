@@ -167,8 +167,8 @@ export default class Homepage extends PureComponent {
             if (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()) {
                 console.log('handling radius change')
                 this.setState({
-                    latitude: this.radius.getCenter().lat(),
-                    longitude: this.radius.getCenter().lng()
+                    radiusLatitude: this.radius.getCenter().lat(),
+                    radiusLongitude: this.radius.getCenter().lng()
                 })
 
                 if (this.radius.getRadius() > 12000) {
@@ -223,33 +223,45 @@ export default class Homepage extends PureComponent {
         //     }
         // })
 
+        // if (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()) {
+        //     console.log('handling radius change')
+        //     this.setState({
+        //         latitude: this.radius.getCenter().lat(),
+        //         longitude: this.radius.getCenter().lng()
+        //     })
 
-        if (this.refsCollection != {}) {
-            console.log('Checking inside circle')
-            console.log(this.refsCollection)
-            this.state.videolist.forEach((data, index) => {
+        // }
+        if (this.radius !== undefined) {
+            if (this.refsCollection != {} && (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng())) {
+                console.log('Checking inside circle')
+                console.log(this.refsCollection)
+                this.state.videolist.forEach((data, index) => {
 
-                let dateFrom = convertStringToDate(data[0].date)
-                let dateTo = convertStringToDate(data[data.length - 1].date)
+                    let dateFrom = convertStringToDate(data[0].date)
+                    let dateTo = convertStringToDate(data[data.length - 1].date)
 
-                if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
+                    if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
 
-                    let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
-                    let markerCoord = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
-                    let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
-                    if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
+                        let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
+                        let markerCoord = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
+                        let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
+                        if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
 
-                        this.refsCollection[index].handleSelectMarker()
+                            this.refsCollection[index].handleSelectMarker()
 
-                        // this.setState((prevState) => {
-                        //     return { selectedVideos: [...prevState.selectedVideos, [data[0].filename]] };
-                        // })
+                            // this.setState((prevState) => {
+                            //     return { selectedVideos: [...prevState.selectedVideos, [data[0].filename]] };
+                            // })
 
+                        } else {
+                            this.refsCollection[index].handleDeselectMarker()
+                        }
                     }
-                }
 
-            })
+                })
+            }
         }
+
 
 
     }
