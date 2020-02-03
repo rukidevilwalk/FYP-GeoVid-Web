@@ -2,11 +2,7 @@ import React, { Fragment, PureComponent } from "react";
 import axios from "axios";
 import {
     GoogleMap,
-    //LoadScript,
     Polyline,
-    //useLoadScript,
-    //Marker,
-    //InfoWindow,
     Polygon
 } from "@react-google-maps/api";
 import { convertSub, createPath, calcDirectionVector } from "../helper"

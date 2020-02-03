@@ -1,7 +1,7 @@
 import React, { Fragment, Component } from "react";
 import {
     Marker,
-    InfoWindow
+    Polyline
 } from "@react-google-maps/api";
 
 export default class InfoMarker extends Component {
@@ -10,6 +10,7 @@ export default class InfoMarker extends Component {
 
         this.state = {
             isOpen: false,
+            pathVisible: false,
             isSelected: false,
             iconURL: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
         }
@@ -20,23 +21,39 @@ export default class InfoMarker extends Component {
         // this.setState({
         //     isOpen: true
         // });
-        console.log('selecting marker')
+
         this.props.setMarkerInfoWindow(this.props.index)
-        console.log(this.marker.getIcon())
-        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+
+        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+
             this.handleDeselectMarker()
-        else
+            this.setState({
+                pathVisible: false
+            })
+        }
+
+        else {
+
             this.handleSelectMarker()
+            this.setState({
+                pathVisible: true
+            })
+        }
+
     }
 
     handleSelectMarker = () => {
 
         this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+
     }
 
     handleDeselectMarker = () => {
 
         this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
+        this.setState({
+            pathVisible: false
+        })
     }
 
     handleToggleClose = () => {
@@ -54,6 +71,7 @@ export default class InfoMarker extends Component {
 
         return (
             <Fragment>
+
                 <Marker
                     key={this.props.index}
                     position={{ lat: this.props.lat, lng: this.props.lng }}
@@ -63,33 +81,30 @@ export default class InfoMarker extends Component {
                     }}
                     icon={this.state.iconURL} //Selected
                 >
-                    {/* {this.state.isOpen &&
-                        <InfoWindow
-                            // onLoad={console.log(this.props.address)}
-                            position={{ lat: this.props.lat, lng: this.props.lng }}
-                            onCloseClick={() => this.handleToggleClose()}>
-                            <div style={{
-                                background: `white`,
-                                border: `1px solid #ccc`,
-                                padding: 15
-                            }}>
-                                <div>
-                                    <p>{'Address: ' + this.props.address}</p>
-                                </div>
-                                <div>
-                                    <p> {'Coordinates: ' + this.props.lat + ', ' + this.props.lng}</p>
-                                </div>
-                                <div>
-                                    <p> {'From: ' + this.props.dateFrom}</p>
-                                </div>
-                                <div>
-                                    <p> {'To: ' + this.props.dateTo}</p>
-                                </div>
-                            </div>
 
-                        </InfoWindow>} */}
                 </Marker>
 
+                <Polyline
+                    key={this.props.index + 1}
+                    onLoad={path => {
+                        this.path = path;
+                    }}
+                    path={this.props.pathdata}
+                    options={{
+                        strokeColor: "#ff0000",
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#ff0000',
+                        fillOpacity: 0.35,
+                        clickable: false,
+                        draggable: false,
+                        editable: false,
+                        visible: this.state.pathVisible,
+                        radius: 30000,
+                        paths: this.props.pathdata,
+                        zIndex: 1
+                    }}
+                />
             </Fragment>
         );
     }

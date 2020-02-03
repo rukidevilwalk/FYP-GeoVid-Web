@@ -20,7 +20,7 @@ import {
     insideCircle
 } from "geolocation-utils";
 import DateTimePicker from 'react-datetime-picker';
-import { convertStringToDate, convertSubSearch } from "../helper";
+import { convertStringToDate, createPath, convertSubSearch, convertSub } from "../helper";
 
 const CancelToken = axios.CancelToken;
 let source;
@@ -56,7 +56,8 @@ export default class Homepage extends PureComponent {
             markerLat: 'None',
             markerLng: 'None',
             markerDateFrom: 'None',
-            markerDateTo: 'None'
+            markerDateTo: 'None',
+            markerPaths: []
         };
 
 
@@ -74,6 +75,7 @@ export default class Homepage extends PureComponent {
             cancelToken: source.token
         }).then(response => {
             this.setState({ videolist: convertSubSearch(response.data) })
+            this.setState({ markerPaths: createPath(convertSub(response.data)) });
             this.getAddrFromLatLng()
         }).catch(function (thrown) {
             if (axios.isCancel(thrown)) {
@@ -364,6 +366,7 @@ export default class Homepage extends PureComponent {
                 key={index}
                 index={index}
                 ref={instance => this.refsCollection[index] = instance}
+                pathdata={this.state.markerPaths[index]}
                 lat={parseFloat(data[0].lat)}
                 lng={parseFloat(data[0].lon)}
                 setMarkerInfoWindow={this.setMarkerInfoWindow}
@@ -459,6 +462,7 @@ export default class Homepage extends PureComponent {
                 >
                     {this.renderRadius()}
                     {this.renderInfoMarkers()}
+
                 </GoogleMap>
             );
         } else {
@@ -466,6 +470,8 @@ export default class Homepage extends PureComponent {
         }
 
     }
+
+
 
     render() {
         return (
