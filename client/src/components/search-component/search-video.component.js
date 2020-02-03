@@ -197,41 +197,59 @@ export default class Homepage extends PureComponent {
 
     checkInsideCirle = () => {
 
+        // Circle and markers must have been rendered
         if (this.radius !== undefined && typeof this.refsCollection !== 'undefined') {
             //  console.log('Checking inside circle1' + '\n' + this.refsCollection + '\n' + this.state.radiusLongitude + " " + this.state.radiusLatitude + " " + this.radius.getCenter().lat() + " " + this.radius.getCenter().lng())
 
             var checkRadius = false
+            var coordInsideCircle = false
 
-            this.refsCollection.forEach(element => {
-                if (element != null)
-                    checkRadius = true;
-            });
+            // Don't run the check if no markers have been initialized
+            this.refsCollection.some(element => {
+                checkRadius = (element !== null)
+                return checkRadius
+            })
 
             if (checkRadius && (this.state.isToggled || (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()))) {
 
-                this.state.videolist.forEach((data, index) => {
+                this.setState({
+                    radiusLatitude: this.radius.getCenter().lat(),
+                    radiusLongitude: this.radius.getCenter().lng()
+                })
 
+                this.state.videolist.forEach((data, index) => {
+                    coordInsideCircle = false
                     let dateFrom = convertStringToDate(data[0].date)
                     let dateTo = convertStringToDate(data[data.length - 1].date)
 
+                    // Only check markers within the date range
                     if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
 
                         let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
-                        let markerCoord = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
-                        let distanceBetweenMarker_Coord = headingDistanceTo(centerOfCircle, markerCoord).distance
-                        if (insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())) {
 
+                        // Select marker if at least one coordinate is inside radius
+                        data.some((coord) => {
+
+                            let markerCoord = { lat: parseFloat(coord.lat), lon: parseFloat(coord.lon) }
+
+                            coordInsideCircle = insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())
+
+                            return coordInsideCircle
+
+                        })
+
+                        if (coordInsideCircle) {
                             this.refsCollection[index].handleSelectMarker()
-
                         } else {
                             this.refsCollection[index].handleDeselectMarker()
                         }
+
                     }
 
                 })
             }
         } else {
-            console.log('Circle not initialized')
+            // console.log('Circle not initialized')
         }
 
 

@@ -22,11 +22,11 @@ export default class InfoMarker extends Component {
         // });
         console.log('selecting marker')
         this.props.setMarkerInfoWindow(this.props.index)
-
-        if (this.state.iconURL == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png')
-            this.setState({ iconURL: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' })
+        console.log(this.marker.getIcon())
+        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+            this.handleDeselectMarker()
         else
-            this.setState({ iconURL: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' })
+            this.handleSelectMarker()
     }
 
     handleSelectMarker = () => {
