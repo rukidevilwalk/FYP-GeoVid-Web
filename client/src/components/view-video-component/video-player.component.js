@@ -50,6 +50,7 @@ export default class VideoPlayer extends PureComponent {
             ref={player => {
               this.player = player
             }}
+            isActive={true}
             muted={true}
             fluid={false}
             width={"auto"}

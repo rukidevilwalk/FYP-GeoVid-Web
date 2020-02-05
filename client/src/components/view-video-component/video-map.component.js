@@ -40,7 +40,7 @@ export default class VideoMap extends PureComponent {
             cancelToken: source.token
         })
             .then(response => {
-                console.log(response.data)
+                //console.log(response.data)
                 this.setState({ subtitle_file: convertSub(response.data) });
 
 
@@ -116,6 +116,7 @@ export default class VideoMap extends PureComponent {
     }
 
     renderDirectionVectors = () => {
+        //console.log(this.state.directionVectors)
         return (this.state.directionVectors.map((data, i) => {
 
             return (data.map((coords, i) => {

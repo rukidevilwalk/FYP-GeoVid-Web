@@ -21,6 +21,7 @@ export default class ViewVideo extends PureComponent {
       earliestStartDate: "",
       latestEndDate: "",
       duration: "",
+      currentTiming: 0,
       videoArr: urlString,
       directionIndex: tempArr,
       colorArr: randomColor({
@@ -33,32 +34,9 @@ export default class ViewVideo extends PureComponent {
 
   refsCollection = {};
 
-  // componentDidMount() {
-  //   let earliestStartDate = ""
-  //   let latestEndDate = ""
-  //   this.props.location.state.videoArr.forEach(videotitle => {
-  //     let tempStart = convertStringToDate(videotitle.startDate)
-  //     let tempEnd = convertStringToDate(videotitle.endDate)
-
-  //     if (earliestStartDate === "")
-  //       earliestStartDate = videotitle.startDate
-
-  //     if (latestEndDate === "")
-  //       latestEndDate = videotitle.endDate
-
-  //     if (earliestStartDate !== "" && convertStringToDate(earliestStartDate) > tempStart)
-  //       earliestStartDate = videotitle.startDate
-
-  //     if (latestEndDate !== "" && convertStringToDate(latestEndDate) < tempEnd)
-  //       latestEndDate = videotitle.endDate
-
-  //   })
-  //   let durationInSeconds = (convertStringToDate(latestEndDate) - convertStringToDate(earliestStartDate)) / 1000
-  //   this.setState({ duration: durationInSeconds.toString() })
-  //   this.setState({ earliestStartDate: earliestStartDate })
-  //   this.setState({ latestEndDate: latestEndDate })
-
-  // }
+  componentDidMount() {
+    this.setState({ currentTiming: this.props.location.state.earliestStart })
+  }
 
   // Controls all videos
   playAll = () => {
@@ -69,33 +47,33 @@ export default class ViewVideo extends PureComponent {
 
   pauseAll = () => {
     this.state.videoArr.forEach(video => {
-      this.refsCollection[video].player.pause();
+      this.refsCollection[video].player.pause()
     });
   }
 
   muteAll = () => {
     this.state.videoArr.forEach(video => {
-      this.refsCollection[video].player.volume = 0;
+      this.refsCollection[video].player.volume = 0
     });
   }
 
   unmuteAll = () => {
     this.state.videoArr.forEach(video => {
-      this.refsCollection[video].player.volume = 1;
+      this.refsCollection[video].player.volume = 1
     });
   }
 
   stopAll = () => {
     this.state.videoArr.forEach(video => {
-      this.refsCollection[video].player.seek(0);
-      this.refsCollection[video].player.pause();
-    });
+      this.refsCollection[video].player.seek(0)
+      this.refsCollection[video].player.pause()
+    })
   }
+
   load = () => {
     this.state.videoArr.forEach(video => {
-      this.refsCollection[video].player.load();
-
-    });
+      this.refsCollection[video].player.load()
+    })
   }
 
   // Set the directionIndex of a video based on filename
@@ -106,38 +84,82 @@ export default class ViewVideo extends PureComponent {
     if (indexFound !== -1) {
       let tempArr = [...this.state.directionIndex]
       tempArr[indexFound].directionIndex = newIndex
-      this.setState({ directionIndex: tempArr });
+      this.setState({ directionIndex: tempArr })
     }
 
-  };
+  }
 
   findIndexOfVideo = (val) => {
-    let index = -1;
+    let index = -1
     let filteredObj = (this.state.directionIndex).find(function (item, i) {
       if (item.videotitle === val) {
-        index = i;
-        return i;
+        index = i
+        return i
       }
     })
     return index
   }
 
   mapRenderedHandler = isRendered => {
-    this.setState({ mapIsRendered: isRendered });
-  };
+    this.setState({ mapIsRendered: isRendered })
+  }
 
   handleSeekSlider = (event) => {
-    this.state.videoArr.forEach(video => {
-      this.refsCollection[video].player.seek(parseInt(event.target.value));
-    });
+    let tempArr = this.props.location.state.videoInfo
+    let tempTime = new Date(this.props.location.state.earliestStart.valueOf());
+    tempTime.setSeconds(tempTime.getSeconds() + parseInt(event.target.value))
+    this.setState({ currentTiming: tempTime })
+    Object.keys(tempArr).map(key => {
+      //console.log(tempArr[key])
+      let tempStart = (tempArr[key].dateFrom)
+      let tempEnd = (tempArr[key].dateTo)
+
+      if (tempTime.getTime() >= tempStart.getTime() && tempEnd.getTime() >= tempTime.getTime()) {
+        let durationInSeconds = ((tempTime) - (tempStart)) / 1000
+        // console.log(this.props.location.state.earliestStart)
+        // console.log('seeking to:' + tempTime)
+        // console.log(tempEnd)
+        // console.log(durationInSeconds)
+        this.refsCollection[tempArr[key].filename].player.seek(durationInSeconds)
+        this.refsCollection[tempArr[key].filename].player.play()
+
+      } else if (tempTime.getTime() >= tempStart.getTime() && tempTime.getTime() >= tempEnd.getTime()) {
+
+        if (this.refsCollection[tempArr[key].filename].player.currentTime != this.refsCollection[tempArr[key].filename].player.duration)
+          this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.duration)
+        this.refsCollection[tempArr[key].filename].player.pause()
+
+      } else if (tempTime.getTime() <= tempStart.getTime() && tempTime.getTime() <= tempEnd.getTime()) {
+
+        if (this.refsCollection[tempArr[key].filename].player.currentTime != 0) {
+          this.refsCollection[tempArr[key].filename].player.seek(0)
+          this.refsCollection[tempArr[key].filename].player.pause()
+        }
+
+      }
+
+
+
+
+
+
+    })
+
+    // this.state.videoArr.forEach(video => {
+    //   this.refsCollection[video].player.seek(parseInt(event.target.value))
+    // })
+
+    // console.log(this.props.location.state.videoInfo)
   }
+
   renderSeekBar = () => {
+
     return (
       <div>
-        <label>Start: {this.state.earliestStartDate} </label>
-        <label>End: {this.state.latestEndDate} </label>
-        <label>Duration (in seconds): {this.state.duration}</label>
-        <input type="range" className="custom-range" id="customRange1" onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.state.duration} />
+        <label>Current Timing: {this.state.currentTiming.toString()}</label>
+
+
+        <input type="range" className="custom-range" id="customRange1" onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.props.location.state.duration} />
       </div>)
 
   }

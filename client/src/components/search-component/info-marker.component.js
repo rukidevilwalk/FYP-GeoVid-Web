@@ -38,7 +38,7 @@ export default class InfoMarker extends Component {
         else {
 
             this.handleSelectMarker()
-            this.props.addSelectedVideos(this.filename)
+            this.props.addSelectedVideos(this.filename, this.props.dateFrom, this.props.dateTo)
             this.setState({
                 pathVisible: true
             })

@@ -65,6 +65,9 @@ export default class Homepage extends PureComponent {
     refsCollection = [];
     selectedVideos = [];
     urlString = ''
+    earliestStartDate = ''
+    latestEndDate = ''
+    duration = ''
 
     componentDidMount() {
 
@@ -79,6 +82,8 @@ export default class Homepage extends PureComponent {
             this.setState({ videolist: convertSubSearch(response.data) })
             this.setState({ markerPaths: createPath(convertSub(response.data)) });
             this.getAddrFromLatLng()
+            //console.log(this.state.videolist)
+
         }).catch(function (thrown) {
             if (axios.isCancel(thrown)) {
                 console.log('Request canceled', thrown.message)
@@ -89,18 +94,50 @@ export default class Homepage extends PureComponent {
 
     }
 
-    renderRedirect = () => {
+    getTimeStamps = () => {
+        //Get the earliest start timestamp and the latest end timestamp for all videos, then get the duratiuon between the two
+        let earliestStartDate = ''
+        let latestEndDate = ''
+        let tempArr = this.selectedVideos
+        Object.keys(tempArr).map(key => {
+            let tempStart = (tempArr[key].dateFrom)
+            let tempEnd = (tempArr[key].dateTo)
+
+            if (earliestStartDate === "")
+                earliestStartDate = tempStart
+
+            if (latestEndDate === "")
+                latestEndDate = tempEnd
+
+            if (earliestStartDate !== "" && (tempStart.getTime() < earliestStartDate.getTime()))
+                earliestStartDate = tempStart
+
+            if (latestEndDate !== "" && tempEnd.getTime() > latestEndDate.getTime())
+                latestEndDate = tempEnd
 
 
-        this.urlString = ''
-
-        this.selectedVideos.forEach((url) => {
-            this.urlString += ('?' + url)
         })
 
-        if (this.selectedVideos.length = 1)
+        let durationInSeconds = ((latestEndDate) - (earliestStartDate)) / 1000
+        this.duration = durationInSeconds.toString()
+        this.earliestStartDate = earliestStartDate
+        this.latestEndDate = latestEndDate
+
+    }
+
+    renderRedirect = () => {
+
+        this.urlString = ''
+        let tempArr = this.selectedVideos
+        Object.keys(tempArr).map(key => {
+            this.urlString += ('?' + tempArr[key].filename)
+        })
+
+        if (tempArr = 1)
             this.urlString = this.urlString.substring(1)
-        console.log(this.urlString)
+
+        this.getTimeStamps()
+
         this.setState({ redirect: true })
 
 
@@ -168,7 +205,7 @@ export default class Homepage extends PureComponent {
         if (this.radius !== undefined) {
 
             if (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()) {
-                console.log('handling radius change')
+                //console.log('handling radius change')
                 this.setState({
                     radiusLatitude: this.radius.getCenter().lat(),
                     radiusLongitude: this.radius.getCenter().lng()
@@ -199,17 +236,32 @@ export default class Homepage extends PureComponent {
     }
 
     removeSelectedVideos = (value) => {
-        console.log('Removing from selectedVideos:' + value)
-        this.selectedVideos = this.selectedVideos.filter(item => item !== value)
+        //console.log('Removing from selectedVideos:' + value)
+        this.selectedVideos = this.selectedVideos.filter(function (obj) {
+            return obj.filename !== value;
+        })
+    }
+
+    addSelectedVideos = (value, dateFrom, dateTo) => {
+
+        let indexFound = this.findIndexOfVideo(this.selectedVideos, value)
+
+        if (indexFound == -1) {
+            // console.log('Adding to selectedVideos:' + value)
+            this.selectedVideos.push({ filename: value, dateFrom: dateFrom, dateTo: dateTo })
+        }
 
     }
 
-    addSelectedVideos = (value) => {
-        if (!this.selectedVideos.includes(value)) {
-            console.log('Adding to selectedVideos:' + value)
-            this.selectedVideos.push(value)
-        }
-
+    findIndexOfVideo = (object, val) => {
+        let index = -1;
+        let filteredObj = (object).find(function (item, i) {
+            if (item.filename === val) {
+                index = i;
+                return i;
+            }
+        })
+        return index
     }
 
 
@@ -259,7 +311,7 @@ export default class Homepage extends PureComponent {
 
                         if (coordInsideCircle) {
                             this.refsCollection[index].handleSelectMarker()
-                            this.addSelectedVideos(data[0].filename)
+                            this.addSelectedVideos(data[0].filename, dateFrom, dateTo)
                         } else {
                             this.refsCollection[index].handleDeselectMarker()
                             this.removeSelectedVideos(data[0].filename)
@@ -268,6 +320,7 @@ export default class Homepage extends PureComponent {
                     }
 
                 })
+                //console.log(this.selectedVideos)
             }
         } else {
             // console.log('Circle not initialized')
@@ -356,7 +409,7 @@ export default class Homepage extends PureComponent {
     fitBounds = () => {
         if (this.state.longitude !== null) {
             const bounds = new window.google.maps.LatLngBounds();
-            console.log(this.radius.getBounds())
+            //console.log(this.radius.getBounds())
             bounds.extend(this.radius.getBounds());
             this.map.fitBounds(bounds);
         }
@@ -387,6 +440,8 @@ export default class Homepage extends PureComponent {
                 filename={data[0].filename}
                 removeSelectedVideos={this.removeSelectedVideos}
                 addSelectedVideos={this.addSelectedVideos}
+                dateFrom={dateFrom}
+                dateTo={dateTo}
                 ref={instance => this.refsCollection[index] = instance}
                 pathdata={this.state.markerPaths[index]}
                 lat={parseFloat(data[0].lat)}
@@ -535,7 +590,13 @@ export default class Homepage extends PureComponent {
 
                         <div className="searchControls">
                             {(this.state.redirect && <Redirect to={{
-                                pathname: '/watch/' + this.urlString
+                                pathname: '/watch/' + this.urlString,
+                                state: {
+                                    earliestStart: this.earliestStartDate,
+                                    latestEnd: this.latestEndDate,
+                                    duration: this.duration,
+                                    videoInfo: this.selectedVideos
+                                }
                             }} />)}
                             <button type="button" className="btn btn-success" onClick={this.renderRedirect}>Search</button>
                         </div>
