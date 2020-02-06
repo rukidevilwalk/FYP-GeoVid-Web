@@ -53,8 +53,9 @@ const storage = new GridFsStorage({
         }
 
         const filename = buf.toString("hex") + path.extname(file.originalname);
-
-        if (file.mimetype == 'application/octet-stream') {
+        console.log(file.mimetype)
+        console.log(filename)
+        if (file.mimetype == 'application/octet-stream' || filename.substring(filename.length - 3) == 'srt') {
           const fileInfo = {
             filename: videoname,
             bucketName: "subtitles"
@@ -63,7 +64,7 @@ const storage = new GridFsStorage({
           console.log(fileInfo);
           resolve(fileInfo);
 
-        } else if (file.mimetype == 'video/mp4') {
+        } else if (file.mimetype == 'video/mp4' || filename.substring(filename.length - 3) == 'mp4') {
           videoname = filename.substr(0, filename.length - 4)
           const fileInfo = {
             filename: videoname,
@@ -74,6 +75,7 @@ const storage = new GridFsStorage({
           resolve(fileInfo);
 
         } else {
+
           reject('Error, wrong file type')
         }
 
