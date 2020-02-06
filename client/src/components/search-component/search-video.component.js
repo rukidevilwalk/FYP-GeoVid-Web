@@ -200,29 +200,12 @@ export default class Homepage extends PureComponent {
 
     // Circle functions
 
-    handleRadiusChange = () => {
+    handleRadiusChange = (event) => {
 
         if (this.radius !== undefined) {
+            console.log(event)
+            this.radius.setRadius(parseInt(event.target.value))
 
-            if (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()) {
-                //console.log('handling radius change')
-                this.setState({
-                    radiusLatitude: this.radius.getCenter().lat(),
-                    radiusLongitude: this.radius.getCenter().lng()
-                })
-
-                if (this.radius.getRadius() > 12000) {
-
-                    this.radius.setRadius(12000)
-
-                } else if (this.radius.getRadius() < 2000) {
-
-                    this.radius.setRadius(2000)
-
-                } else {
-                    // this.setState({ radiusSize: parseInt(this.radius.getRadius()) })
-                }
-            }
         }
     }
 
@@ -230,7 +213,7 @@ export default class Homepage extends PureComponent {
     handleRadiusSlider = (event) => {
         if (this.radius !== undefined) {
             this.radius.setRadius(parseInt(event.target.value))
-            //  this.setState({ radius: parseInt(event.target.value) })
+            //this.setState({ radiusSize: parseInt(event.target.value) })
         }
 
     }
@@ -274,54 +257,85 @@ export default class Homepage extends PureComponent {
             var checkRadius = false
             var coordInsideCircle = false
 
-            // Don't run the check if no markers have been initialized
-            this.refsCollection.some(element => {
-                checkRadius = (element !== null)
-                return checkRadius
-            })
 
-            if (checkRadius && (this.state.isToggled || (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng()))) {
 
-                this.setState({
-                    radiusLatitude: this.radius.getCenter().lat(),
-                    radiusLongitude: this.radius.getCenter().lng()
-                })
+            if (this.state.isToggled || (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng())
+                || (this.state.radiusSize != this.radius.getRadius())
+            ) {
 
-                this.state.videolist.forEach((data, index) => {
+                if (this.state.radiusSize != this.radius.getRadius()) {
+                    if (this.radius.getRadius() > 12000) {
 
-                    coordInsideCircle = false
-                    let dateFrom = convertStringToDate(data[0].date)
-                    let dateTo = convertStringToDate(data[data.length - 1].date)
+                        this.setState({ radiusSize: 12000 })
 
-                    // Only check markers within the date range
-                    if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
+                        this.radius.setRadius(12000)
 
-                        let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
+                    } else if (this.radius.getRadius() < 2000) {
 
-                        // Select marker if at least one coordinate is inside radius
-                        data.some((coord) => {
+                        this.setState({ radiusSize: 2000 })
+                        this.radius.setRadius(2000)
 
-                            let markerCoord = { lat: parseFloat(coord.lat), lon: parseFloat(coord.lon) }
-
-                            coordInsideCircle = insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())
-
-                            return coordInsideCircle
-
+                    } else {
+                        this.setState({
+                            radiusSize: this.radius.getRadius()
                         })
-
-                        if (coordInsideCircle) {
-                            this.refsCollection[index].handleSelectMarker()
-                            this.addSelectedVideos(data[0].filename, dateFrom, dateTo)
-                        } else {
-                            this.refsCollection[index].handleDeselectMarker()
-                            this.removeSelectedVideos(data[0].filename)
-                        }
 
                     }
 
+                }
+                if (this.state.isToggled || (this.state.radiusLatitude != this.radius.getCenter().lat() || this.state.radiusLongitude != this.radius.getCenter().lng())) {
+                    this.setState({
+                        radiusLatitude: this.radius.getCenter().lat(),
+                        radiusLongitude: this.radius.getCenter().lng()
+                    })
+                }
+
+                // Don't run the check if no markers have been initialized
+                this.refsCollection.some(element => {
+                    checkRadius = (element !== null)
+                    return checkRadius
                 })
-                //console.log(this.selectedVideos)
+
+                if (checkRadius) {
+                    this.state.videolist.forEach((data, index) => {
+
+                        coordInsideCircle = false
+                        let dateFrom = convertStringToDate(data[0].date)
+                        let dateTo = convertStringToDate(data[data.length - 1].date)
+
+                        // Only check markers within the date range
+                        if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
+
+                            let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
+
+                            // Select marker if at least one coordinate is inside radius
+                            data.some((coord) => {
+
+                                let markerCoord = { lat: parseFloat(coord.lat), lon: parseFloat(coord.lon) }
+
+                                coordInsideCircle = insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())
+
+                                return coordInsideCircle
+
+                            })
+
+                            if (coordInsideCircle) {
+                                this.refsCollection[index].handleSelectMarker()
+                                this.addSelectedVideos(data[0].filename, dateFrom, dateTo)
+                            } else {
+                                this.refsCollection[index].handleDeselectMarker()
+                                this.removeSelectedVideos(data[0].filename)
+                            }
+
+                        }
+
+                    })
+                    //console.log(this.selectedVideos)
+                }
+
+
             }
+
         } else {
             // console.log('Circle not initialized')
         }
@@ -366,6 +380,7 @@ export default class Homepage extends PureComponent {
                 lat: this.state.radiusLatitude,
                 lng: this.state.radiusLongitude
             }}
+            radius={this.state.radiusSize}
             draggable={true}
             options={{
                 strokeColor: '#FF0000',
@@ -373,10 +388,9 @@ export default class Homepage extends PureComponent {
                 strokeWeight: 2,
                 editable: true,
                 visible: true,
-                radius: this.state.radiusSize,
                 zIndex: 1
             }}
-            onRadiusChanged={this.handleRadiusChange}
+            onRadiusChanged={e => this.checkInsideCirle()}
             onCenterChanged={e => this.checkInsideCirle()}
             onDragEnd={e => console.log('dragend')}
         />))
