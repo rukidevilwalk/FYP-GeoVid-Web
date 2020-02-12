@@ -3,15 +3,39 @@ import axios from "axios"
 import { Progress } from "reactstrap"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
-export default class UploadVideo extends Component {
+ class UploadVideo extends Component {
   constructor(props) {
     super(props)
     this.state = {
       selectedFile: null,
-      loaded: 0
+      loaded: 0,
+      errors: {}
     }
   }
+
+  componentDidMount() {
+    // If logged in and user navigates to Login page, should redirect them to dashboard
+    if (!this.props.auth.isAuthenticated) {
+      this.props.history.push("/login");
+    }
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (!nextProps.auth.isAuthenticated) {
+      this.props.history.push("/login");
+    }
+
+    if (nextProps.errors) {
+      this.setState({
+        errors: nextProps.errors
+      });
+    }
+  }
+
   checkMimeType = event => {
     //getting file object
     let files = event.target.files
@@ -164,3 +188,17 @@ export default class UploadVideo extends Component {
     )
   }
 }
+
+UploadVideo.propTypes = {
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(
+  mapStateToProps
+)(UploadVideo);

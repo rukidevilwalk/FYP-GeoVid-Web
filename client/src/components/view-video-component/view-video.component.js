@@ -3,7 +3,6 @@ import VideoPlayer from "./video-player.component"
 import VideoMap from "./video-map.component"
 import { Button } from 'reactstrap'
 import randomColor from 'randomcolor'
-import { convertStringToDate } from "../helper"
 
 export default class ViewVideo extends PureComponent {
   constructor(props) {
@@ -91,7 +90,7 @@ export default class ViewVideo extends PureComponent {
 
   findIndexOfVideo = (val) => {
     let index = -1
-    let filteredObj = (this.state.directionIndex).find(function (item, i) {
+    this.state.directionIndex.find(function (item, i) {
       if (item.videotitle === val) {
         index = i
         return i
@@ -125,13 +124,13 @@ export default class ViewVideo extends PureComponent {
 
       } else if (tempTime.getTime() >= tempStart.getTime() && tempTime.getTime() >= tempEnd.getTime()) {
 
-        if (this.refsCollection[tempArr[key].filename].player.currentTime != this.refsCollection[tempArr[key].filename].player.duration)
+        if (this.refsCollection[tempArr[key].filename].player.currentTime !== this.refsCollection[tempArr[key].filename].player.duration)
           this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.duration)
         this.refsCollection[tempArr[key].filename].player.pause()
 
       } else if (tempTime.getTime() <= tempStart.getTime() && tempTime.getTime() <= tempEnd.getTime()) {
 
-        if (this.refsCollection[tempArr[key].filename].player.currentTime != 0) {
+        if (this.refsCollection[tempArr[key].filename].player.currentTime !== 0) {
           this.refsCollection[tempArr[key].filename].player.seek(0)
           this.refsCollection[tempArr[key].filename].player.pause()
         }
@@ -223,9 +222,6 @@ export default class ViewVideo extends PureComponent {
         <div className="row col-11 pt-2 mx-auto justify-content-left align-items-left">
           {this.state.videoArr.map((video, index) => {
 
-            let styles = {
-              backgroundColor: this.state.colorArr[index]
-            }
             return this.state.mapIsRendered && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
               <VideoPlayer
                 key={index}

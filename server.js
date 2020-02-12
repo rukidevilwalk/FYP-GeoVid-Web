@@ -12,16 +12,36 @@ Grid.mongo = mongoose.mongo;
 const crypto = require('crypto');
 const router = express.Router();
 const morgan = require('morgan');
+const passport = require("passport");
+const users = require("./routes/api/users");
 
 app.use(cors());
+app.use(
+  bodyParser.urlencoded({
+    extended: false
+  })
+);
 app.use(bodyParser.json());
 app.use(morgan('tiny'))
-// Mongo URL
-const mongoURL = 'mongodb://localhost/GeoVid';
 
+// DB Config
+const db = require("./config/keys").mongoURI;
+// Connect to MongoDB
+mongoose
+  .connect(
+    db,
+    { useNewUrlParser: true }
+  )
+  .then(() => console.log("MongoDB successfully connected"))
+  .catch(err => console.log(err));
 
-// Create mongo connection
-mongoose.connect(mongoURL, { useNewUrlParser: true });
+  // Passport middleware
+app.use(passport.initialize());
+// Passport config
+require("./config/passport")(passport);
+// Routes
+app.use("/api/users", users);
+
 const conn = mongoose.connection;
 
 // Init gfs
@@ -52,8 +72,7 @@ const storage = new GridFsStorage({
         }
 
         const filename = buf.toString("hex") + path.extname(file.originalname);
-        console.log(file.mimetype)
-        console.log(filename)
+
         if (file.mimetype == 'application/octet-stream' || filename.substring(filename.length - 3) == 'srt') {
           const fileInfo = {
             filename: videoname,

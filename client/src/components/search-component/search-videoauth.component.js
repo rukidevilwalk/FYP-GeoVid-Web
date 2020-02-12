@@ -1,4 +1,7 @@
 import React, { Fragment, PureComponent } from "react"
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { logoutUser } from "../../actions/authActions";
 import axios from "axios"
 import { Redirect } from 'react-router-dom'
 import {
@@ -12,27 +15,23 @@ import PlacesAutocomplete, {
 } from 'react-places-autocomplete'
 import Geocode from "react-geocode"
 import {
+
     insideCircle
 } from "geolocation-utils"
 import DateTimePicker from 'react-datetime-picker'
 import { convertStringToDate, createPath, convertSubSearch, convertSub } from "../helper"
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { logoutUser } from "../../actions/authActions";
 
 const CancelToken = axios.CancelToken
 let source
 
 Geocode.setApiKey("AIzaSyCeAosp3NmF1k7mTIYJRJOlPq8LRWhKqgs")
 
-class Homepage extends PureComponent {
+class AuthHomepage extends PureComponent {
 
     constructor(props) {
         super(props)
 
         this.state = {
-            errors: {},
-            loggedIn: false,
             redirect: false,
             videolist: [],
             counter: 0,
@@ -70,28 +69,8 @@ class Homepage extends PureComponent {
     latestEndDate = ''
     duration = ''
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        if (nextProps.auth.isAuthenticated) {
-            console.log('set to true')
-            this.setState({ loggedIn: true })
-        } else {
-            console.log('set to false')
-            this.setState({ loggedIn: false })
-        }
-
-        if (nextProps.errors) {
-            this.setState({
-                errors: nextProps.errors
-            });
-        }
-    }
-
     componentDidMount() {
 
-        if (this.props.auth.isAuthenticated) {
-            console.log('set to true')
-            this.setState({ loggedIn: true })
-        }
         this.setAPILoaded()
         if (source) {
             source.cancel('Operation canceled by the user.')
@@ -590,6 +569,8 @@ class Homepage extends PureComponent {
 
 
     render() {
+        const { user } = this.props.auth;
+
         return (
             <Fragment>
 
@@ -656,21 +637,20 @@ class Homepage extends PureComponent {
                                 <p> {'To: ' + this.state.markerDateTo}</p>
                             </div>
                         </div>
-                        <div>
-                            {(this.state.loggedIn && <button
-                                style={{
-                                    width: "150px",
-                                    borderRadius: "3px",
-                                    letterSpacing: "1.5px",
-                                    marginTop: "1rem"
-                                }}
-                                onClick={this.onLogoutClick}
-                                className="btn btn-large waves-effect waves-light hoverable blue accent-3"
-                            >
-                                Logout
-            </button>)}
-                        </div>
+
                     </div>
+                    <div> <button
+                        style={{
+                            width: "150px",
+                            borderRadius: "3px",
+                            letterSpacing: "1.5px",
+                            marginTop: "1rem"
+                        }}
+                        onClick={this.onLogoutClick}
+                        className="btn btn-large waves-effect waves-light hoverable blue accent-3"
+                    >
+                        Logout
+            </button></div>
                 </div>
 
             </Fragment>
@@ -679,17 +659,15 @@ class Homepage extends PureComponent {
         )
     }
 }
-Homepage.propTypes = {
+AuthHomepage.propTypes = {
     logoutUser: PropTypes.func.isRequired,
-    auth: PropTypes.object.isRequired,
-    errors: PropTypes.object.isRequired
+    auth: PropTypes.object.isRequired
 };
 const mapStateToProps = state => ({
-    auth: state.auth,
-    errors: state.errors
+    auth: state.auth
 });
 export default connect(
     mapStateToProps,
     { logoutUser }
-)(Homepage);
+)(AuthHomepage);
 

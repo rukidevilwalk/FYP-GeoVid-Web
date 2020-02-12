@@ -26,7 +26,7 @@ export default class InfoMarker extends Component {
 
         this.props.setMarkerInfoWindow(this.props.index)
 
-        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+        if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
 
             this.handleDeselectMarker()
             this.props.removeSelectedVideos(this.filename)
@@ -47,7 +47,7 @@ export default class InfoMarker extends Component {
     }
 
     handleSelectMarker = () => {
-        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/red-dot.png') {
+        if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/red-dot.png') {
             this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
         }
 
@@ -55,7 +55,7 @@ export default class InfoMarker extends Component {
     }
 
     handleDeselectMarker = () => {
-        if (this.marker.getIcon() == 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+        if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
             this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
             this.setState({
                 pathVisible: false
