@@ -1,18 +1,18 @@
-import React, { Fragment, PureComponent } from "react";
-import axios from "axios";
+import React, { Fragment, PureComponent } from "react"
+import axios from "axios"
 import {
     GoogleMap,
     Polyline,
     Polygon
-} from "@react-google-maps/api";
+} from "@react-google-maps/api"
 import { convertSub, createPath, calcDirectionVector } from "../helper"
 
-const CancelToken = axios.CancelToken;
-let source;
+const CancelToken = axios.CancelToken
+let source
 
 export default class VideoMap extends PureComponent {
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             isLoaded: false,
@@ -20,7 +20,7 @@ export default class VideoMap extends PureComponent {
             subtitle_file: [],
             map_path: [],
             directionVectors: []
-        };
+        }
     }
 
     componentDidMount() {
@@ -32,28 +32,28 @@ export default class VideoMap extends PureComponent {
         })
         subtitleStr = subtitleStr.substring(0, subtitleStr.length - 1)
         if (source) {
-            source.cancel('Operation canceled by the user.');
+            source.cancel('Operation canceled by the user.')
         }
-        source = CancelToken.source();
+        source = CancelToken.source()
 
         axios.get("http://localhost:8000/subtitle/" + subtitleStr, {
             cancelToken: source.token
         })
             .then(response => {
                 //console.log(response.data)
-                this.setState({ subtitle_file: convertSub(response.data) });
+                this.setState({ subtitle_file: convertSub(response.data) })
 
 
             }).then(() => {
-                this.setState({ map_path: createPath(this.state.subtitle_file) });
+                this.setState({ map_path: createPath(this.state.subtitle_file) })
                 this.setState({
                     directionVectors: calcDirectionVector(this.state.subtitle_file)
-                });
+                })
             }).catch(function (thrown) {
                 if (axios.isCancel(thrown)) {
-                    console.log('Request canceled', thrown.message);
+                    console.log('Request canceled', thrown.message)
                 } else {
-                    console.log(thrown);
+                    console.log(thrown)
                 }
             })
 
@@ -62,22 +62,22 @@ export default class VideoMap extends PureComponent {
 
     fitBounds = () => {
 
-        const bounds = new window.google.maps.LatLngBounds();
+        const bounds = new window.google.maps.LatLngBounds()
         this.state.map_path.forEach(path => {
             path.map(point => {
-                bounds.extend(point);
-                return "Bounds";
-            });
-        });
+                bounds.extend(point)
+                return "Bounds"
+            })
+        })
 
 
-        this.map.fitBounds(bounds);
-    };
+        this.map.fitBounds(bounds)
+    }
 
     loadHandler = () => {
 
-        this.fitBounds();
-    };
+        this.fitBounds()
+    }
 
     // Flag to render map only after Google API has loaded
     setAPILoaded = () => {
@@ -168,7 +168,7 @@ export default class VideoMap extends PureComponent {
                                 zIndex: 1
                             }}
                         />
-                    ];
+                    ]
                 }
             }))
         }))
@@ -182,7 +182,7 @@ export default class VideoMap extends PureComponent {
                     <div className="embed-responsive-item">
                         <GoogleMap
                             onLoad={map => {
-                                this.map = map;
+                                this.map = map
                                 this.loadHandler()
                                 this.setIsRendered()
                             }}
@@ -200,12 +200,12 @@ export default class VideoMap extends PureComponent {
                         </GoogleMap>
                     </div>
                 </Fragment >
-            );
+            )
         } else {
-            return null;
+            return null
         }
 
-    };
+    }
 
     render() {
 
@@ -215,6 +215,6 @@ export default class VideoMap extends PureComponent {
                 {this.renderMap()}
 
             </Fragment>
-        );
+        )
     }
 }

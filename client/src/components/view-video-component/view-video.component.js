@@ -1,20 +1,20 @@
-import React, { Fragment, PureComponent } from "react";
-import VideoPlayer from "./video-player.component";
-import VideoMap from "./video-map.component";
-import { Button } from 'reactstrap';
+import React, { Fragment, PureComponent } from "react"
+import VideoPlayer from "./video-player.component"
+import VideoMap from "./video-map.component"
+import { Button } from 'reactstrap'
 import randomColor from 'randomcolor'
 import { convertStringToDate } from "../helper"
 
 export default class ViewVideo extends PureComponent {
   constructor(props) {
-    super(props);
+    super(props)
 
     let urlString = this.props.match.params.id.split('?')
 
     let tempArr = []
     urlString.forEach(videotitle => {
       tempArr.push({ videotitle: videotitle, directionIndex: 0 })
-    });
+    })
 
     this.state = {
       mapIsRendered: false,
@@ -32,7 +32,7 @@ export default class ViewVideo extends PureComponent {
 
   }
 
-  refsCollection = {};
+  refsCollection = {}
 
   componentDidMount() {
     this.setState({ currentTiming: this.props.location.state.earliestStart })
@@ -41,26 +41,26 @@ export default class ViewVideo extends PureComponent {
   // Controls all videos
   playAll = () => {
     this.state.videoArr.forEach(video => {
-      this.refsCollection[video].player.play();
-    });
+      this.refsCollection[video].player.play()
+    })
   }
 
   pauseAll = () => {
     this.state.videoArr.forEach(video => {
       this.refsCollection[video].player.pause()
-    });
+    })
   }
 
   muteAll = () => {
     this.state.videoArr.forEach(video => {
       this.refsCollection[video].player.volume = 0
-    });
+    })
   }
 
   unmuteAll = () => {
     this.state.videoArr.forEach(video => {
       this.refsCollection[video].player.volume = 1
-    });
+    })
   }
 
   stopAll = () => {
@@ -106,7 +106,7 @@ export default class ViewVideo extends PureComponent {
 
   handleSeekSlider = (event) => {
     let tempArr = this.props.location.state.videoInfo
-    let tempTime = new Date(this.props.location.state.earliestStart.valueOf());
+    let tempTime = new Date(this.props.location.state.earliestStart.valueOf())
     tempTime.setSeconds(tempTime.getSeconds() + parseInt(event.target.value))
     this.setState({ currentTiming: tempTime })
     Object.keys(tempArr).map(key => {
@@ -225,7 +225,7 @@ export default class ViewVideo extends PureComponent {
 
             let styles = {
               backgroundColor: this.state.colorArr[index]
-            };
+            }
             return this.state.mapIsRendered && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
               <VideoPlayer
                 key={index}

@@ -12,7 +12,6 @@ Grid.mongo = mongoose.mongo;
 const crypto = require('crypto');
 const router = express.Router();
 const morgan = require('morgan');
-const send = require('send');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -145,12 +144,12 @@ router.get('/search', (req, res) => {
 
 
       files.forEach(function (file) {
-        const chunks = [];
-        const readstream = gfs.createReadStream(file.filename);
+        const chunks = []
+        const readstream = gfs.createReadStream(file.filename)
 
         readstream.on("data", function (chunk) {
-          chunks.push(chunk);
-        });
+          chunks.push(chunk)
+        })
 
         readstream.on("end", function () {
           let obj = (Buffer.concat(chunks).toString('utf8'));
@@ -158,15 +157,16 @@ router.get('/search', (req, res) => {
           dataArr.push(file.filename + '|' + obj)
           if (dataArr.length === files.length)
             res.json(dataArr)
-        });
+        })
 
-      });
-    });
+      })
+    })
   } catch (error) {
     console.log(error)
   }
 
-});
+})
+
 router.get('/video/:selectedVideos', (req, res) => {
 
   try {

@@ -1,28 +1,28 @@
-import React, { Fragment, PureComponent } from "react";
+import React, { Fragment, PureComponent } from "react"
 import {
   Player,
   // ControlBar, 
   // ProgressControl 
-} from 'video-react';
+} from 'video-react'
 
 export default class VideoPlayer extends PureComponent {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       video_file: [{ videotitle: null, videourl: null }]
-    };
+    }
 
   }
 
   componentDidMount() {
     this.setState({
       video_file: [{ videotitle: this.props.videoname, videourl: "http://localhost:8000/video/" + this.props.videoname }]
-    });
+    })
   }
 
   componentDidUpdate() {
-    this.player.subscribeToStateChange(this.handleStateChange.bind(this));
+    this.player.subscribeToStateChange(this.handleStateChange.bind(this))
 
   }
 
@@ -41,7 +41,7 @@ export default class VideoPlayer extends PureComponent {
     return (this.state.video_file.map((video, index) => {
       let styles = {
         backgroundColor: this.props.color
-      };
+      }
       return (
         <div style={styles} className="pl-2 pr-0 mr-0" key={index}>
           <Player
@@ -71,6 +71,6 @@ export default class VideoPlayer extends PureComponent {
         {this.renderVideoPlayer()}
       </Fragment>
 
-    );
+    )
   }
 }

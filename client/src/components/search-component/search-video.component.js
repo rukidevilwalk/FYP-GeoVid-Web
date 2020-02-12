@@ -1,16 +1,16 @@
-import React, { Fragment, PureComponent } from "react";
-import axios from "axios";
+import React, { Fragment, PureComponent } from "react"
+import axios from "axios"
 import { Redirect } from 'react-router-dom'
 import {
     GoogleMap,
     Circle
-} from "@react-google-maps/api";
-import InfoMarker from "./info-marker.component";
+} from "@react-google-maps/api"
+import InfoMarker from "./info-marker.component"
 import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
-} from 'react-places-autocomplete';
-import Geocode from "react-geocode";
+} from 'react-places-autocomplete'
+import Geocode from "react-geocode"
 import {
     //toLatLon,
     //  toLatitudeLongitude, 
@@ -18,19 +18,19 @@ import {
     //   moveTo, 
     //insidePolygon,
     insideCircle
-} from "geolocation-utils";
-import DateTimePicker from 'react-datetime-picker';
-import { convertStringToDate, createPath, convertSubSearch, convertSub } from "../helper";
+} from "geolocation-utils"
+import DateTimePicker from 'react-datetime-picker'
+import { convertStringToDate, createPath, convertSubSearch, convertSub } from "../helper"
 
-const CancelToken = axios.CancelToken;
-let source;
+const CancelToken = axios.CancelToken
+let source
 
 Geocode.setApiKey("AIzaSyCeAosp3NmF1k7mTIYJRJOlPq8LRWhKqgs")
 
 export default class Homepage extends PureComponent {
 
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             redirect: false,
@@ -58,12 +58,12 @@ export default class Homepage extends PureComponent {
             markerDateFrom: 'None',
             markerDateTo: 'None',
             markerPaths: []
-        };
+        }
 
 
     }
-    refsCollection = [];
-    selectedVideos = [];
+    refsCollection = []
+    selectedVideos = []
     urlString = ''
     earliestStartDate = ''
     latestEndDate = ''
@@ -73,14 +73,14 @@ export default class Homepage extends PureComponent {
 
         this.setAPILoaded()
         if (source) {
-            source.cancel('Operation canceled by the user.');
+            source.cancel('Operation canceled by the user.')
         }
-        source = CancelToken.source();
+        source = CancelToken.source()
         axios.get("http://localhost:8000/search/", {
             cancelToken: source.token
         }).then(response => {
             this.setState({ videolist: convertSubSearch(response.data) })
-            this.setState({ markerPaths: createPath(convertSub(response.data)) });
+            this.setState({ markerPaths: createPath(convertSub(response.data)) })
             this.getAddrFromLatLng()
             //console.log(this.state.videolist)
 
@@ -160,11 +160,11 @@ export default class Homepage extends PureComponent {
         this.setState({
             address,
             errorMessage: '',
-        });
-    };
+        })
+    }
 
     handleSelect = selected => {
-        this.setState({ isGeocoding: true, address: selected });
+        this.setState({ isGeocoding: true, address: selected })
         geocodeByAddress(selected)
             .then(res => getLatLng(res[0]))
             .then(({ lat, lng }) => {
@@ -172,25 +172,25 @@ export default class Homepage extends PureComponent {
                     latitude: lat,
                     longitude: lng,
                     isGeocoding: false,
-                });
+                })
                 this.map.panTo({ lat: this.state.latitude, lng: this.state.longitude })
                 this.map.setZoom(14)
-                //this.fitBounds();
+                //this.fitBounds()
             })
             .catch(error => {
-                this.setState({ isGeocoding: false });
-                console.log('error', error); // eslint-disable-line no-console
-            });
+                this.setState({ isGeocoding: false })
+                console.log('error', error) // eslint-disable-line no-console
+            })
 
-    };
+    }
 
     handleCloseClick = () => {
         this.setState({
             address: '',
             latitude: null,
             longitude: null,
-        });
-    };
+        })
+    }
 
     // Flag to render map only after Google API has loaded
     setAPILoaded = () => {
@@ -221,7 +221,7 @@ export default class Homepage extends PureComponent {
     removeSelectedVideos = (value) => {
         //console.log('Removing from selectedVideos:' + value)
         this.selectedVideos = this.selectedVideos.filter(function (obj) {
-            return obj.filename !== value;
+            return obj.filename !== value
         })
     }
 
@@ -237,11 +237,11 @@ export default class Homepage extends PureComponent {
     }
 
     findIndexOfVideo = (object, val) => {
-        let index = -1;
+        let index = -1
         let filteredObj = (object).find(function (item, i) {
             if (item.filename === val) {
-                index = i;
-                return i;
+                index = i
+                return i
             }
         })
         return index
@@ -374,7 +374,7 @@ export default class Homepage extends PureComponent {
     renderRadius = () => {
         return ((<Circle
             onLoad={radius => {
-                this.radius = radius;
+                this.radius = radius
             }}
             center={{
                 lat: this.state.radiusLatitude,
@@ -404,14 +404,14 @@ export default class Homepage extends PureComponent {
 
             Geocode.fromLatLng(video[0].lat, video[0].lon).then(
                 response => {
-                    const address = response.results[0].formatted_address;
+                    const address = response.results[0].formatted_address
 
                     this.setState(prevState => ({
                         geoAddress: [...prevState.geoAddress, address]
                     }))
                 },
                 error => {
-                    console.error(error);
+                    console.error(error)
                     return ("Address not found.")
                 }
             )
@@ -422,10 +422,10 @@ export default class Homepage extends PureComponent {
 
     fitBounds = () => {
         if (this.state.longitude !== null) {
-            const bounds = new window.google.maps.LatLngBounds();
+            const bounds = new window.google.maps.LatLngBounds()
             //console.log(this.radius.getBounds())
-            bounds.extend(this.radius.getBounds());
-            this.map.fitBounds(bounds);
+            bounds.extend(this.radius.getBounds())
+            this.map.fitBounds(bounds)
         }
 
     }
@@ -435,12 +435,12 @@ export default class Homepage extends PureComponent {
         let dateFrom = convertStringToDate(marker[0].date)
         let dateTo = convertStringToDate(marker[marker.length - 1].date)
 
-        this.setState({ markerAddress: this.state.geoAddress[markerIndex] });
-        this.setState({ markerLat: marker[0].lat });
-        this.setState({ markerLng: marker[0].lon });
-        this.setState({ markerDateFrom: dateFrom });
-        this.setState({ markerDateTo: dateTo });
-    };
+        this.setState({ markerAddress: this.state.geoAddress[markerIndex] })
+        this.setState({ markerLat: marker[0].lat })
+        this.setState({ markerLng: marker[0].lon })
+        this.setState({ markerDateFrom: dateFrom })
+        this.setState({ markerDateTo: dateTo })
+    }
 
     renderInfoMarkers = () => {
 
@@ -474,7 +474,7 @@ export default class Homepage extends PureComponent {
             //  latitude,
             //  longitude,
             // isGeocoding,
-        } = this.state;
+        } = this.state
         return (<PlacesAutocomplete
             onChange={this.handleChange}
             value={address}
@@ -519,14 +519,14 @@ export default class Homepage extends PureComponent {
                                                 {suggestion.formattedSuggestion.secondaryText}
                                             </small>
                                         </div>
-                                    );
+                                    )
                                     /* eslint-enable react/jsx-key */
                                 })}
 
                             </div>
                         )}
                     </div>
-                );
+                )
             }}
         </PlacesAutocomplete>)
 
@@ -537,7 +537,7 @@ export default class Homepage extends PureComponent {
             return (
                 <GoogleMap
                     onLoad={map => {
-                        this.map = map;
+                        this.map = map
                     }}
                     id="search-map"
                     mapContainerStyle={{
@@ -555,9 +555,9 @@ export default class Homepage extends PureComponent {
                     {this.renderInfoMarkers()}
 
                 </GoogleMap>
-            );
+            )
         } else {
-            return null;
+            return null
         }
 
     }

@@ -1,112 +1,112 @@
-import React, { Component } from "react";
-import axios from "axios";
-import { Progress } from "reactstrap";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { Component } from "react"
+import axios from "axios"
+import { Progress } from "reactstrap"
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 export default class UploadVideo extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       selectedFile: null,
       loaded: 0
-    };
+    }
   }
   checkMimeType = event => {
     //getting file object
-    let files = event.target.files;
+    let files = event.target.files
     //define message container
-    let err = [];
+    let err = []
     // list allow mime type
-    const types = ["video/mp4", "text/plain", "image/gif"];
+    const types = ["video/mp4", "text/plain", "image/gif"]
     // loop access array
     for (let y = 0; y < files.length; y++) {
       // compare file type find doesn't matach
       if (types.every(type => files[y].type !== type)) {
         // create error message and assign to container
-        err[y] = files[y].type + " is not a supported format\n";
+        err[y] = files[y].type + " is not a supported format\n"
       }
     }
     for (let z = 0; z < err.length; z++) {
       // if message not same old that mean has error
       // discard selected file
-      toast.error(err[z]);
-      event.target.value = null;
+      toast.error(err[z])
+      event.target.value = null
     }
-    return true;
-  };
+    return true
+  }
   maxSelectFile = event => {
-    let files = event.target.files;
+    let files = event.target.files
     if (files.length > 2) {
-      const msg = "Only 2 images can be uploaded at a time";
-      event.target.value = null;
-      toast.warn(msg);
-      return false;
+      const msg = "Only 2 images can be uploaded at a time"
+      event.target.value = null
+      toast.warn(msg)
+      return false
     }
-    return true;
-  };
+    return true
+  }
   checkFileSize = event => {
-    let files = event.target.files;
-    let size = 2000000;
-    let err = [];
+    let files = event.target.files
+    let size = 2000000
+    let err = []
     for (let x = 0; x < files.length; x++) {
       if (files[x].size > size) {
-        err[x] = files[x].type + " is too large, please pick a smaller file\n";
+        err[x] = files[x].type + " is too large, please pick a smaller file\n"
       }
     }
     for (let z = 0; z < err.length; z++) {
       // if message not same old that mean has error
       // discard selected file
-      toast.error(err[z]);
-      event.target.value = null;
+      toast.error(err[z])
+      event.target.value = null
     }
-    return true;
-  };
+    return true
+  }
   onChangeHandler = event => {
-    let value = event.target.value;
-    let files = event.target.files;
+    let value = event.target.value
+    let files = event.target.files
     if (this.maxSelectFile(event)) {
       // if return true allow to setState
       this.setState({
         selectedFile: files,
         loaded: 0,
         fileValue: value
-      });
+      })
     }
-  };
+  }
 
   checkMimeType = event => {
     //getting file object
-    let files = event.target.files;
+    let files = event.target.files
     //define message container
-    let err = "";
+    let err = ""
     // list allow mime type
-    const types = ["video/mp4"];
+    const types = ["video/mp4"]
     // loop access array
     for (let x = 0; x < files.length; x++) {
       if (types.every(type => files[x].type !== type)) {
-        err += files[x].type + " is not a supported format\n";
+        err += files[x].type + " is not a supported format\n"
       }
     }
 
     if (err !== "") {
       // if message not same old that mean has error
-      event.target.value = null; // discard selected file
-      console.log(err);
-      return false;
+      event.target.value = null // discard selected file
+      console.log(err)
+      return false
     }
-    return true;
-  };
+    return true
+  }
 
   onClickHandler = () => {
-    const data = new FormData();
+    const data = new FormData()
 
     for (let x = 0; x < this.state.selectedFile.length; x++) {
-      let len = this.state.selectedFile.length;
+      let len = this.state.selectedFile.length
       if (this.state.selectedFile[x].name.substr(len - 3, len) === ".srt") {
-        if (x === 0) data.append("file", this.state.selectedFile[x + 1]);
+        if (x === 0) data.append("file", this.state.selectedFile[x + 1])
       } else {
-        data.append("file", this.state.selectedFile[x]);
+        data.append("file", this.state.selectedFile[x])
       }
     }
 
@@ -115,20 +115,20 @@ export default class UploadVideo extends Component {
         onUploadProgress: ProgressEvent => {
           this.setState({
             loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100
-          });
+          })
         }
         // config: { headers: { 'Content-Type': 'multipart/form-data' } }
       })
       .then(res => {
         // then print response status
-        toast.success("upload success");
-        //this.props.history.push('/');
+        toast.success("upload success")
+        //this.props.history.push('/')
       })
       .catch(err => {
         // then print response status
-        toast.error("upload fail");
-      });
-  };
+        toast.error("upload fail")
+      })
+  }
 
   render() {
     return (
@@ -161,6 +161,6 @@ export default class UploadVideo extends Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 }

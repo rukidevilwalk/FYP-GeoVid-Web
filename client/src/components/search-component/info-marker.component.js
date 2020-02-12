@@ -1,12 +1,12 @@
-import React, { Fragment, Component } from "react";
+import React, { Fragment, Component } from "react"
 import {
     Marker,
     Polyline
-} from "@react-google-maps/api";
+} from "@react-google-maps/api"
 
 export default class InfoMarker extends Component {
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             isOpen: false,
@@ -22,7 +22,7 @@ export default class InfoMarker extends Component {
 
         // this.setState({
         //     isOpen: true
-        // });
+        // })
 
         this.props.setMarkerInfoWindow(this.props.index)
 
@@ -68,12 +68,12 @@ export default class InfoMarker extends Component {
 
         // this.setState({
         //     isOpen: false
-        // });
+        // })
     }
 
     init = (marker) => {
         this.filename = this.props.filename
-        this.marker = marker;
+        this.marker = marker
     }
 
     render() {
@@ -96,7 +96,7 @@ export default class InfoMarker extends Component {
                 <Polyline
                     key={this.props.index + 1}
                     onLoad={path => {
-                        this.path = path;
+                        this.path = path
                     }}
                     path={this.props.pathdata}
                     options={{
@@ -115,6 +115,6 @@ export default class InfoMarker extends Component {
                     }}
                 />
             </Fragment>
-        );
+        )
     }
 }
