@@ -4,7 +4,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { loginUser } from "../../actions/authActions";
 import classnames from "classnames";
-
+import 'materialize-css/dist/css/materialize.min.css'
+import M from 'materialize-css'
 class Login extends Component {
   constructor() {
     super();

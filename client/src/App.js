@@ -15,8 +15,6 @@ import UploadVideo from "./components/upload-video.component";
 import WatchVideo from "./components/view-video-component/view-video.component";
 import Login from "./components/auth-component/login";
 import Register from "./components/auth-component/register";
-import PrivateRoute from "./components/private-route/private-route.component";
-import SearchVideoAuth from "./components/search-component/search-videoauth.component";
 import Navbar from "./components/navbar.component";
 
 
@@ -51,8 +49,6 @@ class App extends Component {
             <Route exact path="/upload" component={UploadVideo} />
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
-      
-
           </div>
         </Router>
       </Provider>

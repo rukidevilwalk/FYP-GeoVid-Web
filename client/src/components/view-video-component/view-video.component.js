@@ -168,23 +168,23 @@ export default class ViewVideo extends PureComponent {
     if (this.state.mapIsRendered) {
       return (<div className="col-2">
         <label>Controls </label>
-        <div className="pb-1  btn-group" role="group">
-          <Button className="btn btn-secondary" onClick={this.playAll} >
-            Play All
-      </Button>
+        <div className="pb-2  btn-group" role="group">
+          <button type="button" className="btn btn-secondary" onClick={this.playAll} >
+            Play
+      </button>
           <Button className="btn btn-secondary" onClick={this.pauseAll} >
-            Pause All
+            Pause
       </Button>
           <Button className="btn btn-secondary" onClick={this.stopAll} >
-            Stop All
+            Stop
       </Button>
         </div>
         <div className="btn-group" role="group">
           <Button className="btn btn-secondary" onClick={this.muteAll} >
-            Mute All
+            Mute
       </Button>
           <Button className="btn btn-secondary" onClick={this.unmuteAll} >
-            Unmute All
+            Unmute
       </Button>
           <Button className="btn btn-secondary" onClick={this.load} >
             Load
