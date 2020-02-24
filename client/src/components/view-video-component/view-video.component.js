@@ -3,11 +3,12 @@ import VideoPlayer from "./video-player.component"
 import VideoMap from "./video-map.component"
 import { Button } from 'reactstrap'
 import randomColor from 'randomcolor'
+import ShareIcon from '@material-ui/icons/Share';
 
 export default class ViewVideo extends PureComponent {
   constructor(props) {
     super(props)
-
+    console.log('videoplayer: ' + this.props.match.params.id)
     let urlString = this.props.match.params.id.split('?')
 
     let tempArr = []
@@ -131,7 +132,6 @@ export default class ViewVideo extends PureComponent {
       } else if (tempTime.getTime() >= tempStart.getTime() && tempTime.getTime() >= tempEnd.getTime()) {
 
         if (this.refsCollection[tempArr[key].filename].player.getState().player.currentTime !== this.refsCollection[tempArr[key].filename].player.getState().player.duration) {
-          console.log('2')
           this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration)
           this.refsCollection[tempArr[key].filename].player.pause()
         }
@@ -139,7 +139,6 @@ export default class ViewVideo extends PureComponent {
       } else if (tempTime.getTime() <= tempStart.getTime() && tempTime.getTime() <= tempEnd.getTime()) {
 
         if (this.refsCollection[tempArr[key].filename].player.getState().player.currentTime !== 0) {
-          console.log('3')
           this.refsCollection[tempArr[key].filename].player.seek(0)
           this.refsCollection[tempArr[key].filename].player.pause()
         }
@@ -158,10 +157,9 @@ export default class ViewVideo extends PureComponent {
   renderSeekBar = () => {
 
     return (
+
       <div>
         <label>Current Timing: {this.state.currentTiming.toString()}</label>
-        <div> <label> </label></div>
-
         <input type="range" className="custom-range" id="customRange1" value={this.state.defaultValue} onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.props.location.state.duration} />
       </div>)
 
@@ -195,13 +193,21 @@ export default class ViewVideo extends PureComponent {
       </Button>
 
         </div>
+        <div> <label> </label></div>
         {this.renderSeekBar()}
-
-
+        <div> <label> </label></div>
+ 
+        <button type="button" className="btn btn-email" onClick={this.handleShare}><i class="fas fa-envelope"></i></button>
       </div>)
     }
 
   }
+
+  handleShare = () => {
+    console.log('hi')
+
+  }
+
   render() {
 
     return (

@@ -16,6 +16,7 @@ export default class VideoPlayer extends PureComponent {
   }
 
   componentDidMount() {
+    console.log('videoplayer: '+this.props.videoname)
     this.setState({
       video_file: [{ videotitle: this.props.videoname, videourl: "http://localhost:8000/video/" + this.props.videoname }]
     })
