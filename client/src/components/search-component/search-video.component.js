@@ -140,7 +140,7 @@ class Homepage extends PureComponent {
 
             if (latestEndDate !== "" && tempEnd.getTime() > latestEndDate.getTime())
                 latestEndDate = tempEnd
-
+            return true
 
         })
 
@@ -156,9 +156,10 @@ class Homepage extends PureComponent {
         this.urlString = ''
         let tempArr = this.selectedVideos
 
-        if (tempArr.length != 0) {
+        if (tempArr.length !== 0) {
             Object.keys(tempArr).map(key => {
                 this.urlString += ('?' + tempArr[key].filename)
+                return true
             })
 
             this.urlString = this.urlString.substring(1)

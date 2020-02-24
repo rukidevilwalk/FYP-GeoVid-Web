@@ -3,11 +3,10 @@ import axios from "axios"
 import { Progress } from "reactstrap"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
- class UploadVideo extends Component {
+class UploadVideo extends Component {
   constructor(props) {
     super(props)
     this.state = {

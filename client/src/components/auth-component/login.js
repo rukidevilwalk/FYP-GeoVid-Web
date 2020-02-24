@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { loginUser } from "../../actions/authActions";
 import classnames from "classnames";
 import 'materialize-css/dist/css/materialize.min.css'
-import M from 'materialize-css'
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 class Login extends Component {
   constructor() {
     super();
@@ -58,8 +58,8 @@ class Login extends Component {
         <div style={{ marginTop: "4rem" }} className="row">
           <div className="col s8 offset-s2">
             <Link to="/" className="btn-flat waves-effect">
-              <i className="material-icons left">keyboard_backspace</i> Back to
-              home
+              <KeyboardBackspaceIcon /> Back to
+                home
             </Link>
             <div className="col s12" style={{ paddingLeft: "11.250px" }}>
               <h4>

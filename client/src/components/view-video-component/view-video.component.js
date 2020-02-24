@@ -21,6 +21,7 @@ export default class ViewVideo extends PureComponent {
       latestEndDate: "",
       duration: "",
       currentTiming: 0,
+      defaultValue: "0",
       videoArr: urlString,
       directionIndex: tempArr,
       colorArr: randomColor({
@@ -104,6 +105,7 @@ export default class ViewVideo extends PureComponent {
   }
 
   handleSeekSlider = (event) => {
+    this.setState({ defaultValue: (event.target.value) })
     let tempArr = this.props.location.state.videoInfo
     let tempTime = new Date(this.props.location.state.earliestStart.valueOf())
     tempTime.setSeconds(tempTime.getSeconds() + parseInt(event.target.value))
@@ -124,8 +126,12 @@ export default class ViewVideo extends PureComponent {
 
       } else if (tempTime.getTime() >= tempStart.getTime() && tempTime.getTime() >= tempEnd.getTime()) {
 
-        if (this.refsCollection[tempArr[key].filename].player.currentTime !== this.refsCollection[tempArr[key].filename].player.duration)
+        if (this.refsCollection[tempArr[key].filename].player.currentTime !== this.refsCollection[tempArr[key].filename].player.duration) {
+          console.log('current time: ' + this.refsCollection[tempArr[key].filename].player.currentTime)
+          console.log('duration: ' + this.refsCollection[tempArr[key].filename].player.duration)
           this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.duration)
+        }
+
         this.refsCollection[tempArr[key].filename].player.pause()
 
       } else if (tempTime.getTime() <= tempStart.getTime() && tempTime.getTime() <= tempEnd.getTime()) {
@@ -156,9 +162,9 @@ export default class ViewVideo extends PureComponent {
     return (
       <div>
         <label>Current Timing: {this.state.currentTiming.toString()}</label>
+        <div> <label> </label></div>
 
-
-        <input type="range" className="custom-range" id="customRange1" onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.props.location.state.duration} />
+        <input type="range" className="custom-range" id="customRange1" value={this.state.defaultValue} onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.props.location.state.duration} />
       </div>)
 
   }
@@ -167,7 +173,7 @@ export default class ViewVideo extends PureComponent {
 
     if (this.state.mapIsRendered) {
       return (<div className="col-2">
-        <label>Controls </label>
+        <div> <label>Controls </label></div>
         <div className="pb-2  btn-group" role="group">
           <button type="button" className="btn btn-secondary" onClick={this.playAll} >
             Play
