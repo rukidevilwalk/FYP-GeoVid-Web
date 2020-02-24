@@ -105,48 +105,46 @@ export default class ViewVideo extends PureComponent {
   }
 
   handleSeekSlider = (event) => {
+
     this.setState({ defaultValue: (event.target.value) })
     let tempArr = this.props.location.state.videoInfo
     let tempTime = new Date(this.props.location.state.earliestStart.valueOf())
     tempTime.setSeconds(tempTime.getSeconds() + parseInt(event.target.value))
     this.setState({ currentTiming: tempTime })
+
     Object.keys(tempArr).map(key => {
-      //console.log(tempArr[key])
+
       let tempStart = (tempArr[key].dateFrom)
       let tempEnd = (tempArr[key].dateTo)
 
-      if (tempTime.getTime() >= tempStart.getTime() && tempEnd.getTime() >= tempTime.getTime()) {
+      if (parseInt(event.target.value) == this.props.location.state.duration) {
+
+        this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration)
+        this.refsCollection[tempArr[key].filename].player.pause()
+
+      } else if (tempTime.getTime() >= tempStart.getTime() && tempEnd.getTime() >= tempTime.getTime()) {
+
         let durationInSeconds = ((tempTime) - (tempStart)) / 1000
-        // console.log(this.props.location.state.earliestStart)
-        // console.log('seeking to:' + tempTime)
-        // console.log(tempEnd)
-        // console.log(durationInSeconds)
         this.refsCollection[tempArr[key].filename].player.seek(durationInSeconds)
         this.refsCollection[tempArr[key].filename].player.play()
 
       } else if (tempTime.getTime() >= tempStart.getTime() && tempTime.getTime() >= tempEnd.getTime()) {
 
-        if (this.refsCollection[tempArr[key].filename].player.currentTime !== this.refsCollection[tempArr[key].filename].player.duration) {
-          console.log('current time: ' + this.refsCollection[tempArr[key].filename].player.currentTime)
-          console.log('duration: ' + this.refsCollection[tempArr[key].filename].player.duration)
-          this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.duration)
+        if (this.refsCollection[tempArr[key].filename].player.getState().player.currentTime !== this.refsCollection[tempArr[key].filename].player.getState().player.duration) {
+          console.log('2')
+          this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration)
+          this.refsCollection[tempArr[key].filename].player.pause()
         }
-
-        this.refsCollection[tempArr[key].filename].player.pause()
 
       } else if (tempTime.getTime() <= tempStart.getTime() && tempTime.getTime() <= tempEnd.getTime()) {
 
-        if (this.refsCollection[tempArr[key].filename].player.currentTime !== 0) {
+        if (this.refsCollection[tempArr[key].filename].player.getState().player.currentTime !== 0) {
+          console.log('3')
           this.refsCollection[tempArr[key].filename].player.seek(0)
           this.refsCollection[tempArr[key].filename].player.pause()
         }
 
       }
-
-
-
-
-
 
     })
 
