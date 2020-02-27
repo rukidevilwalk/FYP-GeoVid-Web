@@ -4,7 +4,6 @@ import VideoMap from "./video-map.component"
 import { Button } from 'reactstrap'
 import axios from "axios"
 import randomColor from 'randomcolor'
-import ShareIcon from '@material-ui/icons/Share';
 import {
   EmailShareButton,
   FacebookShareButton,
@@ -21,7 +20,7 @@ import {
   TwitterIcon,
   WhatsappIcon
 } from "react-share";
-import { convertStringToDate, createPath, convertSubSearch, convertSub } from "../helper"
+import { convertStringToDate, convertSubSearch, } from "../helper"
 
 const CancelToken = axios.CancelToken
 let source
@@ -30,7 +29,8 @@ export default class ViewVideo extends PureComponent {
   constructor(props) {
     super(props)
 
-    let urlString = this.props.match.params.id.split('?')
+    let urlString = '' + this.props.location.pathname + this.props.location.search
+    urlString = urlString.substring(7).split('?')
     this.state = {
       mapIsRendered: false,
       latestEndDate: "",
@@ -55,16 +55,16 @@ export default class ViewVideo extends PureComponent {
 
 
   componentDidMount() {
-
-    console.log('videoplayer: ' + this.props.match.params.id)
-
-    let urlString = this.props.match.params.id.split('?')
+    let urlString = '' + this.props.location.pathname + this.props.location.search
+    urlString = urlString.substring(7).split('?')
     let selectedVideos = []
     let tempArr = []
     urlString.forEach(videotitle => {
       tempArr.push({ videotitle: videotitle, directionIndex: 0 })
     })
-    this.setState({ directionIndex: tempArr })
+    this.setState({
+      directionIndex: tempArr
+    })
 
     if (source) {
       source.cancel('Operation canceled by the user.')

@@ -1,7 +1,7 @@
 import React, { Fragment, PureComponent } from "react"
 import {
   Player,
-  ControlBar, 
+  ControlBar,
   // ProgressControl 
 } from 'video-react'
 import DownloadButton from './download-button.component';
@@ -16,7 +16,7 @@ export default class VideoPlayer extends PureComponent {
   }
 
   componentDidMount() {
-    console.log('videoplayer: '+this.props.videoname)
+
     this.setState({
       video_file: [{ videotitle: this.props.videoname, videourl: "http://localhost:8000/video/" + this.props.videoname }]
     })
@@ -58,7 +58,7 @@ export default class VideoPlayer extends PureComponent {
             height={250}
             src={video.videourl}
           >
-               <ControlBar autoHide={false} className="my-class" ><DownloadButton order={7} /></ControlBar>
+            <ControlBar autoHide={false} className="my-class" ><DownloadButton order={7} /></ControlBar>
           </Player>
         </div>
       )
