@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Route} from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
-
+import 'bootstrap';
 import "../node_modules/video-react/dist/video-react.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 import { Provider } from "react-redux";
 import store from "./store";

@@ -2,29 +2,47 @@ import React, { Fragment, PureComponent } from "react"
 import VideoPlayer from "./video-player.component"
 import VideoMap from "./video-map.component"
 import { Button } from 'reactstrap'
+import axios from "axios"
 import randomColor from 'randomcolor'
 import ShareIcon from '@material-ui/icons/Share';
+import {
+  EmailShareButton,
+  FacebookShareButton,
+  LineShareButton,
+  RedditShareButton,
+  TelegramShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+  EmailIcon,
+  FacebookIcon,
+  LineIcon,
+  RedditIcon,
+  TelegramIcon,
+  TwitterIcon,
+  WhatsappIcon
+} from "react-share";
+import { convertStringToDate, createPath, convertSubSearch, convertSub } from "../helper"
+
+const CancelToken = axios.CancelToken
+let source
 
 export default class ViewVideo extends PureComponent {
   constructor(props) {
     super(props)
-    console.log('videoplayer: ' + this.props.match.params.id)
+
     let urlString = this.props.match.params.id.split('?')
-
-    let tempArr = []
-    urlString.forEach(videotitle => {
-      tempArr.push({ videotitle: videotitle, directionIndex: 0 })
-    })
-
     this.state = {
       mapIsRendered: false,
-      earliestStartDate: "",
       latestEndDate: "",
+      videolist: [],
+      videoInfo: [],
       duration: "",
+      earliestStart: '',
+      latestEnd: '',
       currentTiming: 0,
       defaultValue: "0",
       videoArr: urlString,
-      directionIndex: tempArr,
+      directionIndex: [],
       colorArr: randomColor({
         count: urlString.length,
         luminosity: "bright"
@@ -35,8 +53,88 @@ export default class ViewVideo extends PureComponent {
 
   refsCollection = {}
 
+
   componentDidMount() {
-    this.setState({ currentTiming: this.props.location.state.earliestStart })
+
+    console.log('videoplayer: ' + this.props.match.params.id)
+
+    let urlString = this.props.match.params.id.split('?')
+    let selectedVideos = []
+    let tempArr = []
+    urlString.forEach(videotitle => {
+      tempArr.push({ videotitle: videotitle, directionIndex: 0 })
+    })
+    this.setState({ directionIndex: tempArr })
+
+    if (source) {
+      source.cancel('Operation canceled by the user.')
+    }
+    source = CancelToken.source()
+    axios.get("http://localhost:8000/search/", {
+      cancelToken: source.token
+    }).then(response => {
+
+      let tempVidDetails = convertSubSearch(response.data)
+      tempVidDetails.forEach((data) => {
+
+        urlString.forEach((filename) => {
+          if (data[0].filename == filename) {
+            let dateFrom = convertStringToDate(data[0].date)
+            let dateTo = convertStringToDate(data[data.length - 1].date)
+            selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo })
+          }
+        })
+        this.setState({ videoInfo: selectedVideos })
+        this.getTimeStamps()
+
+
+      })
+
+    }).catch(function (thrown) {
+      if (axios.isCancel(thrown)) {
+        console.log('Request canceled', thrown.message)
+      } else {
+        console.log(thrown)
+      }
+    })
+
+  }
+
+  getTimeStamps = () => {
+    //Get the earliest start timestamp and the latest end timestamp for all videos, then get the duratiuon between the two
+    let earliestStartDate = ''
+    let latestEndDate = ''
+    let tempArr = this.state.videoInfo
+    Object.keys(tempArr).map(key => {
+      let tempStart = (tempArr[key].dateFrom)
+      let tempEnd = (tempArr[key].dateTo)
+
+      if (earliestStartDate === "")
+        earliestStartDate = tempStart
+
+      if (latestEndDate === "")
+        latestEndDate = tempEnd
+
+      if (earliestStartDate !== "" && (tempStart.getTime() < earliestStartDate.getTime()))
+        earliestStartDate = tempStart
+
+      if (latestEndDate !== "" && tempEnd.getTime() > latestEndDate.getTime())
+        latestEndDate = tempEnd
+      return true
+
+    })
+
+    let durationInSeconds = ((latestEndDate) - (earliestStartDate)) / 1000
+
+    let tempTime = new Date(earliestStartDate.valueOf())
+
+    this.setState({
+      currentTiming: tempTime,
+      duration: durationInSeconds.toString(),
+      earliestStart: earliestStartDate,
+      latestEnd: latestEndDate
+    })
+
   }
 
   // Controls all videos
@@ -108,8 +206,8 @@ export default class ViewVideo extends PureComponent {
   handleSeekSlider = (event) => {
 
     this.setState({ defaultValue: (event.target.value) })
-    let tempArr = this.props.location.state.videoInfo
-    let tempTime = new Date(this.props.location.state.earliestStart.valueOf())
+    let tempArr = this.state.videoInfo
+    let tempTime = new Date(this.state.earliestStart.valueOf())
     tempTime.setSeconds(tempTime.getSeconds() + parseInt(event.target.value))
     this.setState({ currentTiming: tempTime })
 
@@ -118,7 +216,7 @@ export default class ViewVideo extends PureComponent {
       let tempStart = (tempArr[key].dateFrom)
       let tempEnd = (tempArr[key].dateTo)
 
-      if (parseInt(event.target.value) == this.props.location.state.duration) {
+      if (parseInt(event.target.value) == this.state.duration) {
 
         this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration)
         this.refsCollection[tempArr[key].filename].player.pause()
@@ -150,8 +248,6 @@ export default class ViewVideo extends PureComponent {
     // this.state.videoArr.forEach(video => {
     //   this.refsCollection[video].player.seek(parseInt(event.target.value))
     // })
-
-    // console.log(this.props.location.state.videoInfo)
   }
 
   renderSeekBar = () => {
@@ -160,7 +256,7 @@ export default class ViewVideo extends PureComponent {
 
       <div>
         <label>Current Timing: {this.state.currentTiming.toString()}</label>
-        <input type="range" className="custom-range" id="customRange1" value={this.state.defaultValue} onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.props.location.state.duration} />
+        <input type="range" className="custom-range" id="customRange1" value={this.state.defaultValue} onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.state.duration} />
       </div>)
 
   }
@@ -196,8 +292,72 @@ export default class ViewVideo extends PureComponent {
         <div> <label> </label></div>
         {this.renderSeekBar()}
         <div> <label> </label></div>
- 
-        <button type="button" className="btn btn-email" onClick={this.handleShare}><i class="fas fa-envelope"></i></button>
+
+        {/* <button type="button" className="btn btn-email" onClick={this.handleShare}><i class="fas fa-envelope"></i></button>
+        <ShareIcon/> */}
+
+        <div className="Demo__some-network">
+          <EmailShareButton
+            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            title={'Details of selected videos'}
+            className="Demo__some-network__share-button"
+          >
+            <EmailIcon size={32} round />
+          </EmailShareButton>
+
+
+          <TwitterShareButton
+            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            title={'Details of selected videos'}
+            className="Demo__some-network__share-button"
+          >
+            <TwitterIcon size={32} round />
+          </TwitterShareButton>
+
+          <FacebookShareButton
+            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            title={'Details of selected videos'}
+            className="Demo__some-network__share-button"
+          >
+            <FacebookIcon size={32} round />
+          </FacebookShareButton>
+
+          <LineShareButton
+            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            title={'Details of selected videos'}
+            className="Demo__some-network__share-button"
+          >
+            <LineIcon size={32} round />
+          </LineShareButton>
+
+
+          <RedditShareButton
+            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            title={'Details of selected videos'}
+            className="Demo__some-network__share-button"
+          >
+            <RedditIcon size={32} round />
+          </RedditShareButton>
+
+          <TelegramShareButton
+            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            title={'Details of selected videos'}
+            className="Demo__some-network__share-button"
+          >
+            <TelegramIcon size={32} round />
+          </TelegramShareButton>
+
+
+
+          <WhatsappShareButton
+            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            title={'Details of selected videos'}
+            className="Demo__some-network__share-button"
+          >
+            <WhatsappIcon size={32} round />
+          </WhatsappShareButton>
+        </div>
+
       </div>)
     }
 

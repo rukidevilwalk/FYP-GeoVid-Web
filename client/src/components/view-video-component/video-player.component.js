@@ -1,10 +1,10 @@
 import React, { Fragment, PureComponent } from "react"
 import {
   Player,
-  // ControlBar, 
+  ControlBar, 
   // ProgressControl 
 } from 'video-react'
-
+import DownloadButton from './download-button.component';
 export default class VideoPlayer extends PureComponent {
   constructor(props) {
     super(props)
@@ -57,7 +57,9 @@ export default class VideoPlayer extends PureComponent {
             width={"auto"}
             height={250}
             src={video.videourl}
-          />
+          >
+               <ControlBar autoHide={false} className="my-class" ><DownloadButton order={7} /></ControlBar>
+          </Player>
         </div>
       )
     })

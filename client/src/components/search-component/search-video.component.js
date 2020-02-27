@@ -120,36 +120,6 @@ class Homepage extends PureComponent {
         this.props.logoutUser();
     }
 
-    getTimeStamps = () => {
-        //Get the earliest start timestamp and the latest end timestamp for all videos, then get the duratiuon between the two
-        let earliestStartDate = ''
-        let latestEndDate = ''
-        let tempArr = this.selectedVideos
-        Object.keys(tempArr).map(key => {
-            let tempStart = (tempArr[key].dateFrom)
-            let tempEnd = (tempArr[key].dateTo)
-
-            if (earliestStartDate === "")
-                earliestStartDate = tempStart
-
-            if (latestEndDate === "")
-                latestEndDate = tempEnd
-
-            if (earliestStartDate !== "" && (tempStart.getTime() < earliestStartDate.getTime()))
-                earliestStartDate = tempStart
-
-            if (latestEndDate !== "" && tempEnd.getTime() > latestEndDate.getTime())
-                latestEndDate = tempEnd
-            return true
-
-        })
-
-        let durationInSeconds = ((latestEndDate) - (earliestStartDate)) / 1000
-        this.duration = durationInSeconds.toString()
-        this.earliestStartDate = earliestStartDate
-        this.latestEndDate = latestEndDate
-
-    }
 
     renderRedirect = () => {
 
@@ -163,8 +133,6 @@ class Homepage extends PureComponent {
             })
 
             this.urlString = this.urlString.substring(1)
-
-            this.getTimeStamps()
 
             this.setState({ redirect: true })
         }
@@ -632,13 +600,7 @@ class Homepage extends PureComponent {
 
                         <div className="searchControls">
                             {(this.state.redirect && <Redirect to={{
-                                pathname: '/watch/' + this.urlString,
-                                state: {
-                                    earliestStart: this.earliestStartDate,
-                                    latestEnd: this.latestEndDate,
-                                    duration: this.duration,
-                                    videoInfo: this.selectedVideos
-                                }
+                                pathname: '/watch/' + this.urlString
                             }} />)}
                             <button type="button" className="btn btn-success" onClick={this.renderRedirect}>Search</button>
                         </div>
