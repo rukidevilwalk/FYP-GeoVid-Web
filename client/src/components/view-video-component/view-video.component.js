@@ -78,6 +78,7 @@ export default class ViewVideo extends PureComponent {
       tempVidDetails.forEach((data) => {
 
         urlString.forEach((filename) => {
+
           if (data[0].filename == filename) {
             let dateFrom = convertStringToDate(data[0].date)
             let dateTo = convertStringToDate(data[data.length - 1].date)
