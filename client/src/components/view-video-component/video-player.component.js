@@ -83,7 +83,7 @@ export default class VideoPlayer extends PureComponent {
     }
     this.handleAdd = this.handleAdd.bind(this);
   }
-
+ 
   componentDidMount() {
     if (this.props.videoname.charAt(32) === '&') {
       let tempStr = this.props.videoname.substring(33)

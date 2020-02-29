@@ -18,8 +18,7 @@ import DateTimePicker from 'react-datetime-picker'
 import { convertStringToDate, createPath, convertSubSearch, convertSub } from "../helper"
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { logoutUser } from "../../actions/authActions";
-import { Alert, Button } from 'react-bootstrap';
+
 const CancelToken = axios.CancelToken
 let source
 
@@ -72,10 +71,8 @@ class Homepage extends PureComponent {
 
     UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.auth.isAuthenticated) {
-            console.log('set to true')
             this.setState({ loggedIn: true })
         } else {
-            console.log('set to false')
             this.setState({ loggedIn: false })
         }
 
@@ -89,7 +86,6 @@ class Homepage extends PureComponent {
     componentDidMount() {
 
         if (this.props.auth.isAuthenticated) {
-            console.log('set to true')
             this.setState({ loggedIn: true })
         }
         this.setAPILoaded()
@@ -115,10 +111,6 @@ class Homepage extends PureComponent {
 
     }
 
-    onLogoutClick = e => {
-        e.preventDefault();
-        this.props.logoutUser();
-    }
 
 
     renderRedirect = () => {
@@ -619,20 +611,7 @@ class Homepage extends PureComponent {
                                 <p> {'To: ' + this.state.markerDateTo}</p>
                             </div>
                         </div>
-                        <div>
-                            {(this.state.loggedIn && <button
-                                style={{
-                                    width: "150px",
-                                    borderRadius: "3px",
-                                    letterSpacing: "1.5px",
-                                    marginTop: "1rem"
-                                }}
-                                onClick={this.onLogoutClick}
-                                className="btn btn-large waves-effect waves-light hoverable blue accent-3"
-                            >
-                                Logout
-            </button>)}
-                        </div>
+               
                     </div>
                 </div>
 
@@ -643,7 +622,6 @@ class Homepage extends PureComponent {
     }
 }
 Homepage.propTypes = {
-    logoutUser: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired
 };
@@ -652,7 +630,6 @@ const mapStateToProps = state => ({
     errors: state.errors
 });
 export default connect(
-    mapStateToProps,
-    { logoutUser }
+    mapStateToProps
 )(Homepage);
 

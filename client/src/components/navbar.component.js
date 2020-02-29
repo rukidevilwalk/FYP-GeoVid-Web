@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import logo from "../logo.png";
+import { logoutUser } from "../actions/authActions";
 
 class Navbar extends Component {
     constructor(props) {
@@ -16,7 +17,7 @@ class Navbar extends Component {
         // If logged in and user navigates to Login page, should redirect them to dashboard
         if (this.props.auth.isAuthenticated) {
             this.setState({ loggedIn: true })
-            console.log('true')
+
         }
     }
 
@@ -35,6 +36,11 @@ class Navbar extends Component {
                 errors: nextProps.errors
             });
         }
+    }
+
+    onLogoutClick = e => {
+        e.preventDefault();
+        this.props.logoutUser();
     }
 
     render() {
@@ -57,25 +63,41 @@ class Navbar extends Component {
                                 </li>)}
                             </ul>
                             <div>
-                            <ul className="navbar-nav mr-auto">
-                                    <li className="navbar-item">
-                                        <Link to="/login" className="nav-link">Login</Link>
-                                    </li>
-                                    <li className="navbar-item">
-                                        <Link to="/register" className="nav-link">Register</Link>
-                                    </li>
+                                <ul className="navbar-nav mr-auto">
+
+                                    {(this.state.loggedIn &&
+                                        <li className="navbar-item">
+                                            <p class="font-weight-normal" id="user"> Logged in as: {this.props.auth.user.name}</p>
+                                        </li>)}
+
+                                    {(!this.state.loggedIn &&
+                                        <li className="navbar-item">
+                                            <Link to="/login" className="nav-link">Login</Link>
+                                        </li>)}
+
+                                    {(!this.state.loggedIn &&
+                                        <li className="navbar-item">
+                                            <Link to="/register" className="nav-link">Register</Link>
+                                        </li>)}
+{console.log('hiu')}
+                                    {(this.state.loggedIn &&
+                                        <li className="navbar-item">
+                                            <Link to="/" onClick={this.onLogoutClick} className="nav-link">Logout</Link>
+                                        </li>)}
+
                                 </ul>
                             </div>
                         </div>
                     </nav>
                 </div>
                 <br />
-            </div>
+            </div >
         );
     }
 }
 
 Navbar.propTypes = {
+    logoutUser: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired
 };
@@ -84,7 +106,7 @@ const mapStateToProps = state => ({
     auth: state.auth,
     errors: state.errors
 });
-
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    { logoutUser }
 )(Navbar);

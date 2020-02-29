@@ -19,6 +19,11 @@ code {
 	margin: 1.5%;
 }
 
+.navbar-item #user{
+	margin-top: 7.5px;
+	padding-right: 10px;
+	color:black;
+}
 .search-controls-datetimepicker {
 	padding-bottom: 10%;
 	margin: 1.5%;
