@@ -13,9 +13,8 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
-import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
-
+import { Form } from 'react-bootstrap';
 
 const styles = theme => ({
   root: {
@@ -75,8 +74,10 @@ export default class VideoPlayer extends PureComponent {
     this.state = {
       video_file: [{ videotitle: null, videourl: null }],
       open: false,
-      currentTime: 0,
-      duration: 0,
+      currentTime: '00:00:00',
+      start: '00:00:00',
+      end: '00:00:00',
+      duration: '00:00:00',
       value: [0, 0],
       checked: false
     }
@@ -110,12 +111,16 @@ export default class VideoPlayer extends PureComponent {
 
   handleAdd = (d, ct) => {
 
+    if (this.state.duration === '00:00:00') {
+      this.setState({
+        duration: d
+      })
+    }
+
     this.setState({
-      open: true,
-      currentTime: ct,
-      duration: d,
-      value: [ct, d]
+      open: true
     })
+
   }
 
   handleClose = () => {
@@ -123,12 +128,31 @@ export default class VideoPlayer extends PureComponent {
   };
 
   handleChange = (event, newValue) => {
-    this.setState({ value: newValue })
+
+    var measuredEnd = new Date(null);
+    measuredEnd.setSeconds(newValue[0, 1]); // specify value of SECONDS
+    var MHSEnd = measuredEnd.toISOString().substr(11, 8);
+
+    var measuredStart = new Date(null);
+    measuredStart.setSeconds(newValue[0, 0]); // specify value of SECONDS
+    var MSHStart = measuredStart.toISOString().substr(11, 8);
+
+    this.setState({
+      value: newValue,
+      start: MSHStart,
+      end: MHSEnd,
+    })
   };
 
   handleChecked = event => {
-    console.log(event.target.checked)
+    if (!this.state.checked) {
+      console.log(this.state.value[0, 0] + ' ' + this.state.value[0, 1])
+      this.props.setBookmark(this.props.videoname, this.state.value[0, 0], this.state.value[0, 1])
+
+    }
     this.setState({ checked: event.target.checked })
+
+
   }
 
   renderDialog = () => {
@@ -136,20 +160,18 @@ export default class VideoPlayer extends PureComponent {
       <Dialog value='dialog' aria-labelledby="customized-dialog-title" open={this.state.open}>
         <DialogTitle id="customized-dialog-title" onClose={this.handleClose}>
           Video Details
-</DialogTitle>
+          </DialogTitle>
         <DialogContent dividers>
 
-
           <Typography gutterBottom>
-            Current Time: {this.state.value[0, 0]}
-
+            Start Time: {this.state.start}
           </Typography>
-          <Typography gutterBottom>
 
-            Duration: {this.state.value[0, 1]}
+          <Typography gutterBottom>
+            End Time: {this.state.end}
           </Typography>
-          <Typography gutterBottom>
 
+          <Typography gutterBottom>
             <Slider
               value={this.state.value}
               min={0}
@@ -161,16 +183,19 @@ export default class VideoPlayer extends PureComponent {
             />
           </Typography>
         </DialogContent>
+
         <DialogActions>
-          <Typography gutterBottom>
-            Bookmark Video
-</Typography>
-          <Checkbox
-            checked={this.state.checked}
-            onChange={event => this.handleChecked(event)}
-            value="primary"
-            inputProps={{ 'aria-label': 'Add Video' }}
-          />
+          <Form>
+            <Form.Check
+              type="switch"
+              id="custom-switch"
+              label="Bookmark"
+              checked={this.state.checked}
+              onChange={this.handleChecked}
+            />
+
+          </Form>
+
         </DialogActions>
       </Dialog>)
   }

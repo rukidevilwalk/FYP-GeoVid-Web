@@ -120,7 +120,7 @@ export default class VideoMap extends PureComponent {
         return (this.state.directionVectors.map((data, i) => {
 
             return (data.map((coords, i) => {
-                let index = this.props.findIndexOfVideo(coords.filename)
+                let index = this.props.findIndexOfVideo(coords.filename, 1)
                 if (i === this.props.directionIndex[index].directionIndex && index !== -1) {
 
                     return [

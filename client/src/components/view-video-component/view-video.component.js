@@ -46,7 +46,9 @@ export default class ViewVideo extends PureComponent {
       colorArr: randomColor({
         count: urlString.length,
         luminosity: "bright"
-      })
+      }),
+      bookmarked: [],
+      url: ''
     }
 
   }
@@ -179,7 +181,7 @@ export default class ViewVideo extends PureComponent {
   // Set the directionIndex of a video based on filename
   directionIndexHandler = (videotitle, newIndex) => {
 
-    let indexFound = this.findIndexOfVideo(videotitle)
+    let indexFound = this.findIndexOfVideo(videotitle, 1)
 
     if (indexFound !== -1) {
       let tempArr = [...this.state.directionIndex]
@@ -189,14 +191,60 @@ export default class ViewVideo extends PureComponent {
 
   }
 
-  findIndexOfVideo = (val) => {
-    let index = -1
-    this.state.directionIndex.find(function (item, i) {
-      if (item.videotitle === val) {
-        index = i
-        return i
+  // Set the directionIndex of a video based on filename
+  setBookmark = (videotitle, start, end) => {
+
+    let indexFound = this.findIndexOfVideo(videotitle, 2)
+
+    if (indexFound !== -1) {
+
+      let tempArr = [...this.state.bookmarked]
+      tempArr[indexFound].start = start
+      tempArr[indexFound].end = end
+      this.setState({ bookmarked: tempArr })
+    } else {
+
+      let tempArr = [...this.state.bookmarked]
+      tempArr.push({ videotitle: videotitle, start: start, end: end })
+
+      this.setState({ bookmarked: tempArr })
+    }
+
+    let tempUrl = ''
+    this.state.bookmarked.forEach((video, index) => {
+      tempUrl = tempUrl + video.videotitle + '&s=' + video.start + 'e=' + video.end
+      if (this.state.bookmarked.length - 1 != index) {
+        tempUrl = tempUrl + '?'
       }
+
     })
+    tempUrl = "http://localhost:8000/watch/" + tempUrl
+    this.setState({ url: tempUrl })
+
+  }
+
+  findIndexOfVideo = (val, type) => {
+    let index = -1
+
+    if (type === 1) {
+      this.state.directionIndex.find(function (item, i) {
+        if (item.videotitle === val) {
+          index = i
+          return i
+        }
+      })
+
+    } else {
+
+      this.state.bookmarked.find(function (item, i) {
+        if (item.videotitle === val) {
+          index = i
+          return i
+        }
+      })
+
+    }
+
     return index
   }
 
@@ -299,7 +347,7 @@ export default class ViewVideo extends PureComponent {
 
         <div className="Demo__some-network">
           <EmailShareButton
-            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            url={this.state.url}
             title={'Details of selected videos'}
             className="Demo__some-network__share-button"
           >
@@ -308,7 +356,7 @@ export default class ViewVideo extends PureComponent {
 
 
           <TwitterShareButton
-            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            url={this.state.url}
             title={'Details of selected videos'}
             className="Demo__some-network__share-button"
           >
@@ -316,7 +364,7 @@ export default class ViewVideo extends PureComponent {
           </TwitterShareButton>
 
           <FacebookShareButton
-            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            url={this.state.url}
             title={'Details of selected videos'}
             className="Demo__some-network__share-button"
           >
@@ -324,7 +372,7 @@ export default class ViewVideo extends PureComponent {
           </FacebookShareButton>
 
           <LineShareButton
-            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            url={this.state.url}
             title={'Details of selected videos'}
             className="Demo__some-network__share-button"
           >
@@ -333,7 +381,7 @@ export default class ViewVideo extends PureComponent {
 
 
           <RedditShareButton
-            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            url={this.state.url}
             title={'Details of selected videos'}
             className="Demo__some-network__share-button"
           >
@@ -341,7 +389,7 @@ export default class ViewVideo extends PureComponent {
           </RedditShareButton>
 
           <TelegramShareButton
-            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            url={this.state.url}
             title={'Details of selected videos'}
             className="Demo__some-network__share-button"
           >
@@ -351,7 +399,7 @@ export default class ViewVideo extends PureComponent {
 
 
           <WhatsappShareButton
-            url={"http://localhost:8000/watch/asdsadasdsadas"}
+            url={this.state.url}
             title={'Details of selected videos'}
             className="Demo__some-network__share-button"
           >
@@ -361,11 +409,6 @@ export default class ViewVideo extends PureComponent {
 
       </div>)
     }
-
-  }
-
-  handleShare = () => {
-    console.log('hi')
 
   }
 
@@ -398,6 +441,7 @@ export default class ViewVideo extends PureComponent {
                 key={index}
                 videoname={(video)}
                 color={this.state.colorArr[index]}
+                setBookmark={this.setBookmark}
                 directionIndexHandler={this.directionIndexHandler}
                 ref={instance => this.refsCollection[video] = instance}
               />

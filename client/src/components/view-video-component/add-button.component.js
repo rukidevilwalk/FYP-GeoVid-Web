@@ -22,7 +22,7 @@ export default class AddButton extends PureComponent {
   handleClick(e) {
 
     e.preventDefault();
-    console.log('Duration: ' + this.props.player.duration)
+
     if (e.target.getAttribute('value') === 'addbutton') {
       this.props.handleAdd(this.props.player.duration, this.props.player.currentTime)
     } else {
