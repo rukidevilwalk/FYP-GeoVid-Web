@@ -35,7 +35,7 @@ mongoose
   .then(() => console.log("MongoDB successfully connected"))
   .catch(err => console.log(err));
 
-  // Passport middleware
+// Passport middleware
 app.use(passport.initialize());
 // Passport config
 require("./config/passport")(passport);
@@ -190,7 +190,7 @@ router.get('/video/:selectedVideos', (req, res) => {
 
   try {
     gfs.collection('videos')
-    gfs.files.findOne({ filename: req.params.selectedVideos }, (err, file) => {
+    gfs.files.findOne({ filename: req.params.selectedVideos.substring(0, 32) }, (err, file) => {
       const fileSize = file.length
       const range = req.headers.range
       if (range) {
@@ -248,7 +248,7 @@ router.get('/subtitle/:selectedVideos', (req, res) => {
 
     videoArr.forEach(function (filename) {
 
-      gfs.files.findOne({ filename: filename }, (err, file) => {
+      gfs.files.findOne({ filename: filename.substring(0, 32) }, (err, file) => {
 
         if (!file || file.length === 0) {
           return res.status(404).json({

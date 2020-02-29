@@ -62,11 +62,12 @@ export default class ViewVideo extends PureComponent {
     let selectedVideos = []
     let tempArr = []
     urlString.forEach(videotitle => {
-      tempArr.push({ videotitle: videotitle, directionIndex: 0 })
+      tempArr.push({ videotitle: videotitle.substring(0, 32), directionIndex: 0 })
     })
     this.setState({
       directionIndex: tempArr
     })
+
 
     if (source) {
       source.cancel('Operation canceled by the user.')
@@ -80,8 +81,8 @@ export default class ViewVideo extends PureComponent {
       tempVidDetails.forEach((data) => {
 
         urlString.forEach((filename) => {
-
-          if (data[0].filename == filename) {
+     
+          if (data[0].filename.substring(0, 32) === filename.substring(0, 32)) {
             let dateFrom = convertStringToDate(data[0].date)
             let dateTo = convertStringToDate(data[data.length - 1].date)
             selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo })
@@ -192,35 +193,32 @@ export default class ViewVideo extends PureComponent {
   }
 
   // Set the directionIndex of a video based on filename
-  setBookmark = (videotitle, start, end) => {
+  setBookmark = (videotitle, start) => {
 
     let indexFound = this.findIndexOfVideo(videotitle, 2)
-
+    let tempArr = []
     if (indexFound !== -1) {
-
-      let tempArr = [...this.state.bookmarked]
+      tempArr = [...this.state.bookmarked]
       tempArr[indexFound].start = start
-      tempArr[indexFound].end = end
-      this.setState({ bookmarked: tempArr })
+
     } else {
+      tempArr = [...this.state.bookmarked]
+      tempArr.push({ videotitle: videotitle, start: start })
 
-      let tempArr = [...this.state.bookmarked]
-      tempArr.push({ videotitle: videotitle, start: start, end: end })
 
-      this.setState({ bookmarked: tempArr })
     }
 
     let tempUrl = ''
-    this.state.bookmarked.forEach((video, index) => {
-      tempUrl = tempUrl + video.videotitle + '&s=' + video.start + 'e=' + video.end
-      if (this.state.bookmarked.length - 1 != index) {
+    tempArr.forEach((video, index) => {
+      tempUrl = tempUrl + video.videotitle + '&s=' + video.start
+      if (tempArr.length - 1 !== index) {
         tempUrl = tempUrl + '?'
       }
 
     })
-    tempUrl = "http://localhost:8000/watch/" + tempUrl
+    tempUrl = "http://localhost:3000/watch/" + tempUrl
+    this.setState({ bookmarked: tempArr })
     this.setState({ url: tempUrl })
-
   }
 
   findIndexOfVideo = (val, type) => {
@@ -265,7 +263,7 @@ export default class ViewVideo extends PureComponent {
       let tempStart = (tempArr[key].dateFrom)
       let tempEnd = (tempArr[key].dateTo)
 
-      if (parseInt(event.target.value) == this.state.duration) {
+      if (parseInt(event.target.value) === this.state.duration) {
 
         this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration)
         this.refsCollection[tempArr[key].filename].player.pause()
@@ -334,7 +332,7 @@ export default class ViewVideo extends PureComponent {
             Unmute
       </Button>
           <Button className="btn btn-secondary" onClick={this.load} >
-            Load
+            Reload
       </Button>
 
         </div>
@@ -419,7 +417,7 @@ export default class ViewVideo extends PureComponent {
 
         <div className="row col-11 mx-auto">
 
-          <div className="ml-0 pl-0 col-9 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
+          <div className="ml-0 pl-0 col-10 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
             <VideoMap
               videos={this.state.videoArr}
               colorArr={this.state.colorArr}

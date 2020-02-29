@@ -76,19 +76,23 @@ export default class VideoPlayer extends PureComponent {
       open: false,
       currentTime: '00:00:00',
       start: '00:00:00',
-      end: '00:00:00',
       duration: '00:00:00',
-      value: [0, 0],
-      checked: false
+      value: 0,
+      checked: false,
+      startTime: 0
     }
     this.handleAdd = this.handleAdd.bind(this);
   }
 
   componentDidMount() {
+    if (this.props.videoname.charAt(32) === '&') {
+      let tempStr = this.props.videoname.substring(33)
+      let startTime = tempStr.substring(2)
+      this.setState({ startTime: parseInt(startTime) })
+    }
 
     this.setState({
       video_file: [{ videotitle: this.props.videoname, videourl: "http://localhost:8000/video/" + this.props.videoname }],
-
     })
 
   }
@@ -105,7 +109,7 @@ export default class VideoPlayer extends PureComponent {
 
     //Update respective map direction vector according to video's current time
     if (parseInt(state.currentTime) > parseInt(prevState.currentTime) || (parseInt(state.currentTime) === 0 && state.hasStarted))
-      this.props.directionIndexHandler(this.state.video_file[0].videotitle, parseInt(state.currentTime))
+      this.props.directionIndexHandler(this.state.video_file[0].videotitle.substring(0, 32), parseInt(state.currentTime))
 
   }
 
@@ -129,25 +133,19 @@ export default class VideoPlayer extends PureComponent {
 
   handleChange = (event, newValue) => {
 
-    var measuredEnd = new Date(null);
-    measuredEnd.setSeconds(newValue[0, 1]); // specify value of SECONDS
-    var MHSEnd = measuredEnd.toISOString().substr(11, 8);
-
     var measuredStart = new Date(null);
-    measuredStart.setSeconds(newValue[0, 0]); // specify value of SECONDS
+    measuredStart.setSeconds(newValue); // specify value of SECONDS
     var MSHStart = measuredStart.toISOString().substr(11, 8);
 
     this.setState({
       value: newValue,
-      start: MSHStart,
-      end: MHSEnd,
+      start: MSHStart
     })
   };
 
   handleChecked = event => {
     if (!this.state.checked) {
-      console.log(this.state.value[0, 0] + ' ' + this.state.value[0, 1])
-      this.props.setBookmark(this.props.videoname, this.state.value[0, 0], this.state.value[0, 1])
+      this.props.setBookmark(this.props.videoname, this.state.value)
 
     }
     this.setState({ checked: event.target.checked })
@@ -165,10 +163,6 @@ export default class VideoPlayer extends PureComponent {
 
           <Typography gutterBottom>
             Start Time: {this.state.start}
-          </Typography>
-
-          <Typography gutterBottom>
-            End Time: {this.state.end}
           </Typography>
 
           <Typography gutterBottom>
@@ -206,7 +200,6 @@ export default class VideoPlayer extends PureComponent {
       let styles = {
         backgroundColor: this.props.color
       }
-
       return (
         <div style={styles} className="pl-2 pr-0 mr-0" key={index}>
           <Player
@@ -220,6 +213,7 @@ export default class VideoPlayer extends PureComponent {
             fluid={false}
             width={"auto"}
             height={250}
+            startTime={this.state.startTime}
             src={video.videourl}
           >
             <ControlBar handleAdd={this.handleAdd} autoHide={false} className="my-class" ><AddButton order={7} /></ControlBar>
