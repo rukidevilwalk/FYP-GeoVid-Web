@@ -19,7 +19,7 @@ import { convertStringToDate, createPath, convertSubSearch, convertSub } from ".
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser } from "../../actions/authActions";
-
+import { Alert, Button } from 'react-bootstrap';
 const CancelToken = axios.CancelToken
 let source
 
@@ -135,6 +135,8 @@ class Homepage extends PureComponent {
             this.urlString = this.urlString.substring(1)
 
             this.setState({ redirect: true })
+        } else {
+            alert('Please select at least one video!')
         }
     }
 
@@ -561,8 +563,6 @@ class Homepage extends PureComponent {
     render() {
         return (
             <Fragment>
-
-
                 <div id="SearchMap" className="row mx-auto col-11">
 
                     <div className="col-xl-9 embed-responsive">
