@@ -326,7 +326,7 @@ export default class ViewVideo extends PureComponent {
     let tempTime = new Date(this.state.earliestStart.valueOf())
     tempTime.setSeconds(tempTime.getSeconds() + parseInt(event.target.value))
     this.setState({ currentTiming: tempTime })
-  
+
 
     Object.keys(tempArr).map(key => {
 
@@ -340,11 +340,12 @@ export default class ViewVideo extends PureComponent {
       } else if (tempTime.getTime() >= tempStart.getTime() && tempEnd.getTime() >= tempTime.getTime()) {
         let durationInSeconds = (tempTime - tempStart) / 1000
         if (durationInSeconds <= this.refsCollection[tempArr[key].filename].player.getState().player.duration) {
-
           this.refsCollection[tempArr[key].filename].player.seek(durationInSeconds)
           this.refsCollection[tempArr[key].filename].player.play()
+        } else {
+          this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration - 0.1)
+          this.refsCollection[tempArr[key].filename].player.play()
         }
-
 
       } else if (tempTime.getTime() >= tempStart.getTime() && tempTime.getTime() >= tempEnd.getTime()) {
         if (this.refsCollection[tempArr[key].filename].player.getState().player.currentTime !== this.refsCollection[tempArr[key].filename].player.getState().player.duration) {
