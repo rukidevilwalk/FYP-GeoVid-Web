@@ -118,59 +118,72 @@ export default class VideoMap extends PureComponent {
     renderDirectionVectors = () => {
         //console.log(this.state.directionVectors)
         return (this.state.directionVectors.map((data, i) => {
+            let notdone = true
 
             return (data.map((coords, i) => {
-                let index = this.props.findIndexOfVideo(coords.filename, 1)
-                if (i === this.props.directionIndex[index].directionIndex && index !== -1) {
+                if (notdone) {
+                    let index = this.props.findIndexOfVideo(coords.filename, 1)
 
-                    return [
-                        // Viewing vector
-                        <Polyline
-                            key={i + 1}
-                            path={[
-                                { lat: coords.initial.lat, lng: coords.initial.lng },
-                                { lat: coords.left.lat, lng: coords.left.lng },
-                                { lat: coords.initial.lat, lng: coords.initial.lng },
-                                { lat: coords.right.lat, lng: coords.right.lng }
-                            ]}
-                            options={{
-                                strokeColor: "#FF0000",
-                                strokeOpacity: 0.8,
-                                strokeWeight: 2,
-                                fillColor: "lightblue",
-                                fillOpacity: 1,
-                                clickable: false,
-                                draggable: false,
-                                editable: false,
-                                visible: true,
-                                radius: 30000,
 
-                                zIndex: 1
-                            }}
-                        />,
-                        <Polygon
-                            key={i}
-                            paths={[
-                                { lat: coords.initial.lat, lng: coords.initial.lng },
-                                { lat: coords.left.lat, lng: coords.left.lng },
-                                { lat: coords.right.lat, lng: coords.right.lng }
-                            ]}
-                            options={{
-                                fillColor: "lightblue",
-                                fillOpacity: 1,
-                                strokeColor: "red",
-                                strokeOpacity: 0,
-                                strokeWeight: 2,
-                                clickable: false,
-                                draggable: false,
-                                editable: false,
-                                geodesic: false,
-                                zIndex: 1
-                            }}
-                        />
-                    ];
+                    let time = coords.timeFrom.split(':'); // split it at the colons
+
+                    // minutes are worth 60 seconds. Hours are worth 60 minutes.
+                    var seconds = (+time[0]) * 60 * 60 + (+time[1]) * 60 + (+time[2]);
+
+
+                    if (seconds === this.props.directionIndex[index].directionIndex && index !== -1) {
+                        notdone = false
+                        return [
+                            // Viewing vector
+                            <Polyline
+                                key={i + 1}
+                                path={[
+                                    { lat: coords.initial.lat, lng: coords.initial.lng },
+                                    { lat: coords.left.lat, lng: coords.left.lng },
+                                    { lat: coords.initial.lat, lng: coords.initial.lng },
+                                    { lat: coords.right.lat, lng: coords.right.lng }
+                                ]}
+                                options={{
+                                    strokeColor: "#FF0000",
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 2,
+                                    fillColor: "lightblue",
+                                    fillOpacity: 1,
+                                    clickable: false,
+                                    draggable: false,
+                                    editable: false,
+                                    visible: true,
+                                    radius: 30000,
+
+                                    zIndex: 1
+                                }}
+                            />,
+                            <Polygon
+                                key={i}
+                                paths={[
+                                    { lat: coords.initial.lat, lng: coords.initial.lng },
+                                    { lat: coords.left.lat, lng: coords.left.lng },
+                                    { lat: coords.right.lat, lng: coords.right.lng }
+                                ]}
+                                options={{
+                                    fillColor: "lightblue",
+                                    fillOpacity: 1,
+                                    strokeColor: "red",
+                                    strokeOpacity: 0,
+                                    strokeWeight: 2,
+                                    clickable: false,
+                                    draggable: false,
+                                    editable: false,
+                                    geodesic: false,
+                                    zIndex: 1
+                                }}
+                            />
+                        ];
+                    }
                 }
             }))
+
+
         }))
     }
 

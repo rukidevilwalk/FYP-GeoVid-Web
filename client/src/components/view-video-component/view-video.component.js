@@ -282,7 +282,7 @@ export default class ViewVideo extends PureComponent {
       }
       this.setState({ bookmarked: tempArr })
       this.setState({ url: tempUrl })
-    
+
     }
 
   }
@@ -326,6 +326,7 @@ export default class ViewVideo extends PureComponent {
     let tempTime = new Date(this.state.earliestStart.valueOf())
     tempTime.setSeconds(tempTime.getSeconds() + parseInt(event.target.value))
     this.setState({ currentTiming: tempTime })
+  
 
     Object.keys(tempArr).map(key => {
 
@@ -333,25 +334,25 @@ export default class ViewVideo extends PureComponent {
       let tempEnd = (tempArr[key].dateTo)
 
       if (parseInt(event.target.value) === this.state.duration) {
-
         this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration)
         this.refsCollection[tempArr[key].filename].player.pause()
 
       } else if (tempTime.getTime() >= tempStart.getTime() && tempEnd.getTime() >= tempTime.getTime()) {
+        let durationInSeconds = (tempTime - tempStart) / 1000
+        if (durationInSeconds <= this.refsCollection[tempArr[key].filename].player.getState().player.duration) {
 
-        let durationInSeconds = ((tempTime) - (tempStart)) / 1000
-        this.refsCollection[tempArr[key].filename].player.seek(durationInSeconds)
-        this.refsCollection[tempArr[key].filename].player.play()
+          this.refsCollection[tempArr[key].filename].player.seek(durationInSeconds)
+          this.refsCollection[tempArr[key].filename].player.play()
+        }
+
 
       } else if (tempTime.getTime() >= tempStart.getTime() && tempTime.getTime() >= tempEnd.getTime()) {
-
         if (this.refsCollection[tempArr[key].filename].player.getState().player.currentTime !== this.refsCollection[tempArr[key].filename].player.getState().player.duration) {
           this.refsCollection[tempArr[key].filename].player.seek(this.refsCollection[tempArr[key].filename].player.getState().player.duration)
           this.refsCollection[tempArr[key].filename].player.pause()
         }
 
       } else if (tempTime.getTime() <= tempStart.getTime() && tempTime.getTime() <= tempEnd.getTime()) {
-
         if (this.refsCollection[tempArr[key].filename].player.getState().player.currentTime !== 0) {
           this.refsCollection[tempArr[key].filename].player.seek(0)
           this.refsCollection[tempArr[key].filename].player.pause()

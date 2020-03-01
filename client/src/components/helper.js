@@ -42,7 +42,6 @@ export function convertSub(content) {
         split2 = split2.replace(/,,/g, ",")
         split2 = split2.replace(" ", "")
 
-
         let index, filename, date, timeFrom, timeTo, lat, lon, direction
         let string = ""
         let count = 0
@@ -194,6 +193,8 @@ export function calcDirectionVector(subtitle_file) {
     let directionVectors = []
     subtitle_file.forEach(path => {
         path.forEach(function (data) {
+
+            let index = data.timeFrom.indexOf(',')
             const leftCoords = moveTo(
                 { lat: parseFloat(data.lat), lon: parseFloat(data.lon) },
                 { distance: 50, heading: parseInt(data.direction) - 22.5 }
@@ -208,7 +209,8 @@ export function calcDirectionVector(subtitle_file) {
                 filename: data.filename,
                 initial: { lat: parseFloat(data.lat), lng: parseFloat(data.lon) },
                 left: { lat: leftCoords.lat, lng: leftCoords.lon },
-                right: { lat: rightCoords.lat, lng: rightCoords.lon }
+                right: { lat: rightCoords.lat, lng: rightCoords.lon },
+                timeFrom: data.timeFrom.substring(0, index)
             })
 
         })
