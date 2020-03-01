@@ -59,6 +59,7 @@ export default class ViewVideo extends PureComponent {
 
   componentDidMount() {
     let urlString = '' + this.props.location.pathname + this.props.location.search
+    this.setState({ url: "http://localhost:3000" + urlString })
     urlString = urlString.substring(7).split('?')
     let selectedVideos = []
     let tempArr = []
@@ -211,38 +212,87 @@ export default class ViewVideo extends PureComponent {
   }
 
   // Set the directionIndex of a video based on filename
-  setBookmark = (videotitle, start) => {
+  handleAddBookmark = (videotitle, start) => {
 
     let indexFound = this.findIndexOfVideo(videotitle, 2)
     let tempArr = []
+
     if (indexFound !== -1) {
+
       tempArr = [...this.state.bookmarked]
       tempArr[indexFound].start = start
 
     } else {
+
       tempArr = [...this.state.bookmarked]
       tempArr.push({ videotitle: videotitle, start: start })
-
 
     }
 
     let tempUrl = ''
+
     tempArr.forEach((video, index) => {
+
       tempUrl = tempUrl + video.videotitle + '&s=' + video.start
+
       if (tempArr.length - 1 !== index) {
         tempUrl = tempUrl + '?'
       }
 
     })
+
     tempUrl = "http://localhost:3000/watch/" + tempUrl
     this.setState({ bookmarked: tempArr })
     this.setState({ url: tempUrl })
+
+  }
+
+  handleRemoveBookmark = (videotitle) => {
+
+    let indexFound = this.findIndexOfVideo(videotitle, 2)
+    let tempArr = []
+    let tempUrl = ''
+
+    if (indexFound !== -1) {
+
+      tempArr = [...this.state.bookmarked]
+
+      tempArr = tempArr.filter(function (obj) {
+        return obj.videotitle !== videotitle
+      })
+
+      if (tempArr.length !== 0) {
+
+        tempArr.forEach((video, index) => {
+
+          tempUrl = tempUrl + video.videotitle + '&s=' + video.start
+
+          if (tempArr.length - 1 !== index) {
+            tempUrl = tempUrl + '?'
+          }
+
+        })
+
+        tempUrl = "http://localhost:3000/watch/" + tempUrl
+
+      } else {
+
+        tempUrl = "http://localhost:3000" + this.props.location.pathname + this.props.location.search
+
+      }
+      this.setState({ bookmarked: tempArr })
+      this.setState({ url: tempUrl })
+    
+    }
+
   }
 
   findIndexOfVideo = (val, type) => {
+
     let index = -1
 
     if (type === 1) {
+
       this.state.directionIndex.find(function (item, i) {
         if (item.videotitle === val) {
           index = i
@@ -253,6 +303,7 @@ export default class ViewVideo extends PureComponent {
     } else {
 
       this.state.bookmarked.find(function (item, i) {
+
         if (item.videotitle === val) {
           index = i
           return i
@@ -310,9 +361,6 @@ export default class ViewVideo extends PureComponent {
 
     })
 
-    // this.state.videoArr.forEach(video => {
-    //   this.refsCollection[video].player.seek(parseInt(event.target.value))
-    // })
   }
 
   renderSeekBar = () => {
@@ -462,7 +510,8 @@ export default class ViewVideo extends PureComponent {
                 endAddress={video.endAddress}
                 videoname={(video.filename)}
                 color={this.state.colorArr[index]}
-                setBookmark={this.setBookmark}
+                handleAddBookmark={this.handleAddBookmark}
+                handleRemoveBookmark={this.handleRemoveBookmark}
                 directionIndexHandler={this.directionIndexHandler}
                 ref={instance => this.refsCollection[video.filename] = instance}
               />

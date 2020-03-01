@@ -156,8 +156,10 @@ export default class VideoPlayer extends PureComponent {
 
   handleChecked = event => {
     if (!this.state.checked) {
-      this.props.setBookmark(this.props.videoname, this.state.value)
+      this.props.handleAddBookmark(this.props.videoname, this.state.value)
 
+    } else {
+      this.props.handleRemoveBookmark(this.props.videoname)
     }
     this.setState({ checked: event.target.checked })
 
