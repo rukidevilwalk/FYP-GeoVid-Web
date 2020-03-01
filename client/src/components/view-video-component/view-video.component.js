@@ -21,6 +21,7 @@ import {
   WhatsappIcon
 } from "react-share";
 import { convertStringToDate, convertSubSearch, } from "../helper"
+import Geocode from "react-geocode"
 
 const CancelToken = axios.CancelToken
 let source
@@ -80,16 +81,33 @@ export default class ViewVideo extends PureComponent {
       let tempVidDetails = convertSubSearch(response.data)
       tempVidDetails.forEach((data) => {
 
-        urlString.forEach((filename) => {
-     
-          if (data[0].filename.substring(0, 32) === filename.substring(0, 32)) {
-            let dateFrom = convertStringToDate(data[0].date)
-            let dateTo = convertStringToDate(data[data.length - 1].date)
-            selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo })
-          }
-        })
-        this.setState({ videoInfo: selectedVideos })
-        this.getTimeStamps()
+        let startAddress = ''
+        let endAddress = ''
+        Geocode.fromLatLng(data[0].lat, data[0].lon).then(
+          response => {
+            startAddress = response.results[0].formatted_address
+
+            Geocode.fromLatLng(data[data.length - 1].lat, data[data.length - 1].lon).then(
+              response => {
+                endAddress = response.results[0].formatted_address
+
+                urlString.forEach((filename) => {
+
+                  if (data[0].filename.substring(0, 32) === filename.substring(0, 32)) {
+                    let dateFrom = convertStringToDate(data[0].date)
+                    let dateTo = convertStringToDate(data[data.length - 1].date)
+                    selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo, startAddress: startAddress, endAddress: endAddress })
+                  }
+                })
+                this.setState({ videoInfo: selectedVideos })
+                this.getTimeStamps()
+              })
+
+          })
+
+
+
+
 
 
       })
@@ -432,16 +450,21 @@ export default class ViewVideo extends PureComponent {
         </div>
 
         <div className="row col-11 pt-2 mx-auto justify-content-left align-items-left">
-          {this.state.videoArr.map((video, index) => {
+          {this.state.videoInfo.map((video, index) => {
 
             return this.state.mapIsRendered && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
+
               <VideoPlayer
                 key={index}
-                videoname={(video)}
+                dateTo={video.dateTo}
+                dateFrom={video.dateFrom}
+                startAddress={video.startAddress}
+                endAddress={video.endAddress}
+                videoname={(video.filename)}
                 color={this.state.colorArr[index]}
                 setBookmark={this.setBookmark}
                 directionIndexHandler={this.directionIndexHandler}
-                ref={instance => this.refsCollection[video] = instance}
+                ref={instance => this.refsCollection[video.filename] = instance}
               />
             </div>
           })}

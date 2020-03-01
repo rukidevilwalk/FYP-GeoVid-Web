@@ -5,6 +5,7 @@ import {
   // ProgressControl 
 } from 'video-react'
 import AddButton from './add-button.component';
+import InfoButton from './info-button.component';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -15,6 +16,8 @@ import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { Form } from 'react-bootstrap';
+import $ from 'jquery';
+window.$ = $;
 
 const styles = theme => ({
   root: {
@@ -79,11 +82,13 @@ export default class VideoPlayer extends PureComponent {
       duration: '00:00:00',
       value: 0,
       checked: false,
-      startTime: 0
+      startTime: 0,
+      showInfo: false
     }
     this.handleAdd = this.handleAdd.bind(this);
+
   }
- 
+
   componentDidMount() {
     if (this.props.videoname.charAt(32) === '&') {
       let tempStr = this.props.videoname.substring(33)
@@ -111,6 +116,12 @@ export default class VideoPlayer extends PureComponent {
     if (parseInt(state.currentTime) > parseInt(prevState.currentTime) || (parseInt(state.currentTime) === 0 && state.hasStarted))
       this.props.directionIndexHandler(this.state.video_file[0].videotitle.substring(0, 32), parseInt(state.currentTime))
 
+  }
+
+  handleInfo = () => {
+    $('#videoInfoModal').modal({
+      show: true
+    })
   }
 
   handleAdd = (d, ct) => {
@@ -216,7 +227,10 @@ export default class VideoPlayer extends PureComponent {
             startTime={this.state.startTime}
             src={video.videourl}
           >
-            <ControlBar handleAdd={this.handleAdd} autoHide={false} className="my-class" ><AddButton order={7} /></ControlBar>
+            <ControlBar handleInfo={this.handleInfo} handleAdd={this.handleAdd} autoHide={false} className="my-class" >
+              <AddButton order={8} />
+              <InfoButton order={7} />
+            </ControlBar>
           </Player>
           {this.renderDialog()}
         </div>
@@ -230,6 +244,32 @@ export default class VideoPlayer extends PureComponent {
   render() {
     return (
       <Fragment>
+
+
+        <div className="modal fade" tabIndex="-1" id="videoInfoModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Video Details</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <p ><strong>Start:</strong></p>
+                <p>{this.props.dateFrom.toString()}</p>
+                <p> {this.props.startAddress}</p>
+
+                <p><strong>  End:</strong></p>
+                <p> {this.props.dateTo.toString()}</p>
+                <p> {this.props.endAddress}</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>)
         {this.renderVideoPlayer()}
       </Fragment>
 

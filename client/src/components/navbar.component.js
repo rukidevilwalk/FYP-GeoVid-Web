@@ -67,7 +67,7 @@ class Navbar extends Component {
 
                                     {(this.state.loggedIn &&
                                         <li className="navbar-item">
-                                            <p class="font-weight-normal" id="user"> Logged in as: {this.props.auth.user.name}</p>
+                                            <p className="font-weight-bold" id="user"> Logged in as: {this.props.auth.user.name}</p>
                                         </li>)}
 
                                     {(!this.state.loggedIn &&
@@ -79,7 +79,7 @@ class Navbar extends Component {
                                         <li className="navbar-item">
                                             <Link to="/register" className="nav-link">Register</Link>
                                         </li>)}
-{console.log('hiu')}
+
                                     {(this.state.loggedIn &&
                                         <li className="navbar-item">
                                             <Link to="/" onClick={this.onLogoutClick} className="nav-link">Logout</Link>
