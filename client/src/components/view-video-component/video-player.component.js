@@ -262,7 +262,7 @@ export default class VideoPlayer extends PureComponent {
                 <p>{this.props.dateFrom.toString()}</p>
                 <p> {this.props.startAddress}</p>
 
-                <p><strong>  End:</strong></p>
+                <p><strong>End:</strong></p>
                 <p> {this.props.dateTo.toString()}</p>
                 <p> {this.props.endAddress}</p>
               </div>
@@ -271,7 +271,7 @@ export default class VideoPlayer extends PureComponent {
               </div>
             </div>
           </div>
-        </div>)
+        </div>
         {this.renderVideoPlayer()}
       </Fragment>
 

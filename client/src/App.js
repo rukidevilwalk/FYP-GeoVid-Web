@@ -12,6 +12,7 @@ import store from "./store";
 import SearchVideo from "./components/search-component/search-video.component";
 import UploadVideo from "./components/upload-video.component";
 import WatchVideo from "./components/view-video-component/view-video.component";
+import UserUploads from "./components/user-uploads.component";
 import Login from "./components/auth-component/login";
 import Register from "./components/auth-component/register";
 import Navbar from "./components/navbar.component";
@@ -48,6 +49,7 @@ class App extends Component {
             <Route exact path="/upload" component={UploadVideo} />
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
+            <Route exact path="/uploads" component={UserUploads} />
           </div>
         </Router>
       </Provider>

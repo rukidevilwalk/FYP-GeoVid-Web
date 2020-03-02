@@ -25,10 +25,8 @@ class Navbar extends Component {
     UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.auth.isAuthenticated) {
             this.setState({ loggedIn: true })
-            console.log('true')
         } else {
             this.setState({ loggedIn: false })
-            console.log('false')
         }
 
         if (nextProps.errors) {
@@ -58,6 +56,9 @@ class Navbar extends Component {
                                 <li className="navbar-item">
                                     <Link to="/" className="nav-link">Home</Link>
                                 </li>
+                                {(this.state.loggedIn && <li className="navbar-item">
+                                    <Link to="/uploads" className="nav-link">View Uploads</Link>
+                                </li>)}
                                 {(this.state.loggedIn && <li className="navbar-item">
                                     <Link to="/upload" className="nav-link">Upload Video</Link>
                                 </li>)}

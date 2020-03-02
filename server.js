@@ -14,7 +14,7 @@ const router = express.Router();
 const morgan = require('morgan');
 const passport = require("passport");
 const users = require("./routes/api/users");
-
+const uploads = require("./models/Uploads");
 app.use(cors());
 app.use(
   bodyParser.urlencoded({
@@ -105,14 +105,21 @@ const storage = new GridFsStorage({
 const upload = multer({ storage }).any();
 
 router.post('/upload', (req, res) => {
+
+
   try {
     upload(req, res, function (err) {
+
       if (err) {
         console.log(err);
         return res.end("Error uploading file.");
       } else {
-
-        res.end("File has been uploaded");
+        newUpload = new uploads({
+          user: req.body.user,
+          filename: res.req.files[0].filename
+        })
+        newUpload.save()
+        return res.end("File has been uploaded");
       }
     });
   } catch (error) {
@@ -121,23 +128,12 @@ router.post('/upload', (req, res) => {
 
 });
 
-router.get('/videos', (req, res) => {
-
+router.get('/uploads:user', (req, res) => {
   try {
-    gfs.collection('subtitles')
-
-    gfs.files.find().toArray((err, files) => {
-
-      if (!files || files.length === 0) {
-        return res.status(404).json({
-          err: 'No files exist'
-        });
-      }
-
-      return res.json(files);
-
-
+    uploads.find({}, function (err, uploads) {
+      res.send(uploads)
     });
+ 
   } catch (error) {
     console.log(error)
   }
