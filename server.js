@@ -106,7 +106,6 @@ const upload = multer({ storage }).any();
 
 router.post('/upload', (req, res) => {
 
-
   try {
     upload(req, res, function (err) {
 

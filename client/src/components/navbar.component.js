@@ -60,6 +60,9 @@ class Navbar extends Component {
                                     <Link to="/uploads" className="nav-link">View Uploads</Link>
                                 </li>)}
                                 {(this.state.loggedIn && <li className="navbar-item">
+                                    <Link to="/bookmarks" className="nav-link">View Bookmarks</Link>
+                                </li>)}
+                                {(this.state.loggedIn && <li className="navbar-item">
                                     <Link to="/upload" className="nav-link">Upload Video</Link>
                                 </li>)}
                             </ul>

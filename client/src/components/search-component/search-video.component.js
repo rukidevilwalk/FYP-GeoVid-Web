@@ -591,7 +591,7 @@ class Homepage extends PureComponent {
                         </div>
 
                         <div className="searchControls">
-                            {(this.state.redirect && <Redirect to={{
+                            {(this.state.redirect && <Redirect push to={{
                                 pathname: '/watch/' + this.urlString
                             }} />)}
                             <button type="button" className="btn btn-success" onClick={this.renderRedirect}>Search</button>

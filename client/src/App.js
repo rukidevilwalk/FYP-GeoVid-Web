@@ -5,7 +5,7 @@ import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
 import 'bootstrap';
 import "../node_modules/video-react/dist/video-react.css";
-
+import "bootstrap/dist/css/bootstrap.min.css";
 import { Provider } from "react-redux";
 import store from "./store";
 
@@ -16,7 +16,7 @@ import UserUploads from "./components/user-uploads.component";
 import Login from "./components/auth-component/login";
 import Register from "./components/auth-component/register";
 import Navbar from "./components/navbar.component";
-
+import UserBookmarks from "./components/user-bookmarks.component";
 
 if (localStorage.jwtToken) {
   // Set auth token header auth
@@ -50,6 +50,7 @@ class App extends Component {
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/uploads" component={UserUploads} />
+            <Route exact path="/bookmarks" component={UserBookmarks} />
           </div>
         </Router>
       </Provider>

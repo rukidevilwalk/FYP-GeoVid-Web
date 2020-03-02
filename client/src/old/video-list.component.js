@@ -55,7 +55,12 @@ export default class SearchVideo extends PureComponent {
     });
 
 
-    this.state = { redirect: false, videolist: tempArr, checked: false, selectedVideos: [] };
+    this.state = {
+      redirect: false,
+      videolist: tempArr,
+      checked: false,
+      selectedVideos: []
+    }
 
   }
 

@@ -55,7 +55,7 @@ const VideoList = props => (
   </div>
 )
 
-class UserUploads extends PureComponent {
+class UserBookmarks extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -89,7 +89,7 @@ class UserUploads extends PureComponent {
     }
 
     axios
-      .get("http://localhost:8000/uploads" + this.props.auth.user.name)
+      .get("http://localhost:8000/bookmarks" + this.props.auth.user.name)
       .then(res => {
         let tempArr = []
         let subtitleStr = ""
@@ -259,7 +259,7 @@ tempUrl = ''
     )
   }
 }
-UserUploads.propTypes = {
+UserBookmarks.propTypes = {
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
@@ -271,4 +271,4 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps
-)(UserUploads);
+)(UserBookmarks);
