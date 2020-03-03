@@ -240,7 +240,7 @@ export default class VideoPlayer extends PureComponent {
         </DialogContent>
 
         <DialogActions>
-          <Form>
+          {this.props.loggedIn && <Form>
             <Form.Check
               type="switch"
               id="bookmark-switch"
@@ -249,8 +249,7 @@ export default class VideoPlayer extends PureComponent {
               onChange={this.handleBookmarkChecked}
             />
 
-          </Form>
-
+          </Form>}
           <Form>
             <Form.Check
               type="switch"

@@ -50,10 +50,12 @@ class ViewVideo extends PureComponent {
         count: urlString.length,
         luminosity: "bright"
       }),
+      appliedColorArr: [],
       shared: [],
       url: '',
       errors: {},
-      bookmarked: []
+      bookmarked: [],
+      loggedIn: false
     }
 
   }
@@ -62,6 +64,11 @@ class ViewVideo extends PureComponent {
 
 
   UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.auth.isAuthenticated) {
+      this.setState({ loggedIn: true })
+    } else {
+      this.setState({ loggedIn: false })
+    }
 
     if (nextProps.errors) {
       this.setState({
@@ -70,12 +77,20 @@ class ViewVideo extends PureComponent {
     }
   }
 
+
   componentDidMount() {
-    let urlString = '' + this.props.location.pathname + this.props.location.search
-    this.setState({ url: "http://localhost:3000" + urlString })
-    urlString = urlString.substring(7).split('?')
+
+    if (this.props.auth.isAuthenticated) {
+      this.setState({ loggedIn: true })
+    }
     let selectedVideos = []
     let tempArr = []
+    let tempColorArr = []
+    let urlString = '' + this.props.location.pathname + this.props.location.search
+
+    this.setState({ url: "http://localhost:3000" + urlString })
+    urlString = urlString.substring(7).split('?')
+
     urlString.forEach(videotitle => {
       tempArr.push({ videotitle: videotitle.substring(0, 32), directionIndex: 0 })
     })
@@ -105,22 +120,26 @@ class ViewVideo extends PureComponent {
               response => {
                 endAddress = response.results[0].formatted_address
 
-                urlString.forEach((filename) => {
+                urlString.forEach((filename, index) => {
 
                   if (data[0].filename.substring(0, 32) === filename.substring(0, 32)) {
                     let dateFrom = convertStringToDate(data[0].date)
                     let dateTo = convertStringToDate(data[data.length - 1].date)
                     selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo, startAddress: startAddress, endAddress: endAddress })
+
+
+                    tempColorArr.push({ filename: filename, color: this.state.colorArr[index] })
                   }
                 })
                 axios.get("http://localhost:8000/bookmarks" + this.props.auth.user.email).then(response => {
                   this.setState({ bookmarked: response.data })
                   this.setState({ videoInfo: selectedVideos })
+                  this.setState({ appliedColorArr: tempColorArr })
                   this.getTimeStamps()
                 })
-            
 
-              
+
+
               })
           })
       })
@@ -322,8 +341,16 @@ class ViewVideo extends PureComponent {
         }
       })
 
-    } else {
+    } else if (type === 3) {
       this.state.bookmarked.find(function (item, i) {
+
+        if (item.filename === val) {
+          index = i
+          return i
+        }
+      })
+    } else if (type === 4) {
+      this.state.appliedColorArr.find(function (item, i) {
 
         if (item.filename === val) {
           index = i
@@ -504,16 +531,16 @@ class ViewVideo extends PureComponent {
       <Fragment>
 
         <div className="row col-11 mx-auto">
-
           <div className="ml-0 pl-0 col-10 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
-            <VideoMap
+            {this.state.appliedColorArr.length == this.state.videoArr.length && <VideoMap
               videos={this.state.videoArr}
               colorArr={this.state.colorArr}
+              appliedColorArr={this.state.appliedColorArr}
               directionIndex={this.state.directionIndex}
               mapRenderedHandler={this.mapRenderedHandler}
               findIndexOfVideo={this.findIndexOfVideo}
               mapIsRendered={(this.state.mapIsRendered)}
-            />
+            />}
 
           </div>
           {this.renderVideoControls()}
@@ -522,7 +549,8 @@ class ViewVideo extends PureComponent {
         <div className="row col-11 pt-2 mx-auto justify-content-left align-items-left">
           {this.state.videoInfo.map((video, index) => {
             let isBookmarked = this.findIndexOfVideo(video.filename, 3)
-            return this.state.mapIsRendered && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
+            let colorIndex = this.findIndexOfVideo(video.filename, 4)
+            return this.state.mapIsRendered && this.state.appliedColorArr.length == this.state.videoArr.length && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
 
               <VideoPlayer
                 key={index}
@@ -531,9 +559,10 @@ class ViewVideo extends PureComponent {
                 startAddress={video.startAddress}
                 endAddress={video.endAddress}
                 videoname={(video.filename)}
-                color={this.state.colorArr[index]}
+                color={this.state.appliedColorArr[colorIndex].color}
                 handleAddShare={this.handleAddShare}
                 isBookmarked={isBookmarked !== -1}
+                loggedIn={this.state.loggedIn}
                 email={this.props.auth.user.email}
                 handleRemoveShare={this.handleRemoveShare}
                 directionIndexHandler={this.directionIndexHandler}

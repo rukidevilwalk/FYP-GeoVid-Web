@@ -91,17 +91,30 @@ export default class VideoMap extends PureComponent {
             this.props.mapRenderedHandler(true)
     }
 
+    findIndexOfVideo = (val) => {
+        let index = -1
+
+        this.props.appliedColorArr.find(function (item, i) {
+            if (item.filename === val) {
+                index = i
+                return i
+            }
+        })
+
+        return index
+    }
+
     renderPaths = () => {
         return (this.state.map_path.map((data, index) => {
-
+            let colorIndex = this.findIndexOfVideo(this.state.subtitle_file[index][0].filename)
             return <Polyline
                 key={index}
                 path={data}
                 options={{
-                    strokeColor: this.props.colorArr[index],
+                    strokeColor: this.props.appliedColorArr[colorIndex].color,
                     strokeOpacity: 0.8,
                     strokeWeight: 2,
-                    fillColor: this.props.colorArr[index],
+                    fillColor: this.props.appliedColorArr[colorIndex].color,
                     fillOpacity: 0.35,
                     clickable: false,
                     draggable: false,
