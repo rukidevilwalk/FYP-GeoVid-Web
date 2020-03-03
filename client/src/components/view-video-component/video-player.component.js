@@ -4,6 +4,9 @@ import {
   ControlBar,
   // ProgressControl 
 } from 'video-react'
+import axios from "axios"
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import AddButton from './add-button.component';
 import InfoButton from './info-button.component';
 import Dialog from '@material-ui/core/Dialog';
@@ -70,7 +73,7 @@ function valuetext(value) {
 }
 
 
-export default class VideoPlayer extends PureComponent {
+ class VideoPlayer extends PureComponent {
   constructor(props) {
     super(props)
 
@@ -81,15 +84,36 @@ export default class VideoPlayer extends PureComponent {
       start: '00:00:00',
       duration: '00:00:00',
       value: 0,
-      checked: false,
+      share_checked: false,
+      bookmark_checked: false,
       startTime: 0,
-      showInfo: false
+      showInfo: false,
+      loggedIn: false
     }
     this.handleAdd = this.handleAdd.bind(this);
 
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.auth.isAuthenticated) {
+        this.setState({ loggedIn: true })
+    } else {
+        this.setState({ loggedIn: false })
+    }
+
+    if (nextProps.errors) {
+        this.setState({
+            errors: nextProps.errors
+        });
+    }
+}
+
   componentDidMount() {
+
+    if (this.props.auth.isAuthenticated) {
+      this.setState({ loggedIn: true })
+  }
+
     if (this.props.videoname.charAt(32) === '&') {
       let tempStr = this.props.videoname.substring(33)
       let startTime = tempStr.substring(2)
@@ -154,15 +178,55 @@ export default class VideoPlayer extends PureComponent {
     })
   };
 
-  handleChecked = event => {
-    if (!this.state.checked) {
+  handleShareChecked = event => {
+    if (!this.state.share_checked) {
       this.props.handleAddBookmark(this.props.videoname, this.state.value)
 
     } else {
       this.props.handleRemoveBookmark(this.props.videoname)
     }
-    this.setState({ checked: event.target.checked })
+    this.setState({ share_checked: event.target.checked })
 
+
+  }
+
+  
+  handleBookmarkChecked = event => {
+
+    //checked
+    if (!this.state.bookmark_checked) {
+
+axios
+  .post("http://localhost:8000/bookmarks"  , {
+    user: this.props.auth.user.name,
+    filename: this.props.videoname
+    })
+  .then(res => {
+    // then print response status
+  })
+  .catch(err => {
+    // then print response status
+
+  })
+
+    } else {
+      axios
+      .delete("http://localhost:8000/bookmarks"  , {
+        params: 
+        { user: this.props.auth.user.name,
+          filename: this.props.videoname}
+        })
+      .then(res => {
+        // then print response status
+    
+      })
+      .catch(err => {
+        // then print response status
+  
+      })
+    }
+
+    this.setState({ bookmark_checked: event.target.checked })
 
   }
 
@@ -192,13 +256,24 @@ export default class VideoPlayer extends PureComponent {
         </DialogContent>
 
         <DialogActions>
+        <Form>
+            <Form.Check
+              type="switch"
+              id="bookmark-switch"
+              label="Bookmark"
+              checked={this.state.bookmark_checked}
+              onChange={this.handleBookmarkChecked}
+            />
+
+          </Form>
+
           <Form>
             <Form.Check
               type="switch"
-              id="custom-switch"
-              label="Bookmark"
-              checked={this.state.checked}
-              onChange={this.handleChecked}
+              id="share-switch"
+              label="Share"
+              checked={this.state.share_checked}
+              onChange={this.handleShareChecked}
             />
 
           </Form>
@@ -278,3 +353,16 @@ export default class VideoPlayer extends PureComponent {
     )
   }
 }
+VideoPlayer.propTypes = {
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(
+  mapStateToProps
+)(VideoPlayer);

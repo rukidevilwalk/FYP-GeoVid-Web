@@ -15,10 +15,12 @@ const morgan = require('morgan');
 const passport = require("passport");
 const users = require("./routes/api/users");
 const uploads = require("./models/Uploads");
+const bookmarks = require("./models/Bookmarks");
+
 app.use(cors());
 app.use(
   bodyParser.urlencoded({
-    extended: false
+    extended: true
   })
 );
 app.use(bodyParser.json());
@@ -129,7 +131,7 @@ router.post('/upload', (req, res) => {
 
 router.get('/uploads:user', (req, res) => {
   try {
-    uploads.find({}, function (err, uploads) {
+    uploads.find({user: req.params.user}, function (err, uploads) {
       res.send(uploads)
     });
  
@@ -137,7 +139,47 @@ router.get('/uploads:user', (req, res) => {
     console.log(error)
   }
 
+});
 
+router.get('/bookmarks:user', (req, res) => {
+  try {
+    bookmarks.find({user: req.params.user}, function (err, bookmarks) {
+      res.send(bookmarks)
+    });
+ 
+  } catch (error) {
+    console.log(error)
+  }
+
+});
+
+
+router.post('/bookmarks', (req, res) => {
+
+  console.log(req.body.user +' '+req.body.filename)
+  bookmarks.find({user: req.body.user,filename:req.body.filename}, function (err, file) {
+    if (!file || file.length === 0) {
+
+  newBookmark = new bookmarks({
+    user: req.body.user,
+    filename: req.body.filename
+  })
+  newBookmark.save()
+  return res.end("File has been uploaded");
+ }
+  });
+  
+});
+
+router.delete('/bookmarks', (req, res) => {
+
+console.log(req.query.user +' '+req.query.filename)
+  bookmarks.findOneAndDelete({user: req.query.user,filename:req.query.filename}, function (err, file) {
+  
+  return res.end("File deleted");
+ 
+  });
+  
 });
 
 router.get('/search', (req, res) => {

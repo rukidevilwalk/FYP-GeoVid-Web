@@ -2,8 +2,10 @@ import React, { Fragment, PureComponent } from "react"
 import VideoPlayer from "./video-player.component"
 import VideoMap from "./video-map.component"
 import { Button } from 'reactstrap'
+import PropTypes from "prop-types";
 import axios from "axios"
 import randomColor from 'randomcolor'
+import { connect } from "react-redux";
 import {
   EmailShareButton,
   FacebookShareButton,
@@ -26,7 +28,7 @@ import Geocode from "react-geocode"
 const CancelToken = axios.CancelToken
 let source
 
-export default class ViewVideo extends PureComponent {
+class ViewVideo extends PureComponent {
   constructor(props) {
     super(props)
 
@@ -49,13 +51,23 @@ export default class ViewVideo extends PureComponent {
         luminosity: "bright"
       }),
       bookmarked: [],
-      url: ''
+      url: '',
+      errors:{}
     }
 
   }
 
   refsCollection = {}
 
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+ 
+    if (nextProps.errors) {
+      this.setState({
+        errors: nextProps.errors
+      });
+    }
+  }
 
   componentDidMount() {
     let urlString = '' + this.props.location.pathname + this.props.location.search
@@ -414,7 +426,7 @@ export default class ViewVideo extends PureComponent {
         <div className="Demo__some-network">
           <EmailShareButton
             url={this.state.url}
-            title={'Details of selected videos'}
+               title={'URL'}
             className="Demo__some-network__share-button"
           >
             <EmailIcon size={32} round />
@@ -423,7 +435,7 @@ export default class ViewVideo extends PureComponent {
 
           <TwitterShareButton
             url={this.state.url}
-            title={'Details of selected videos'}
+               title={'URL'}
             className="Demo__some-network__share-button"
           >
             <TwitterIcon size={32} round />
@@ -431,7 +443,7 @@ export default class ViewVideo extends PureComponent {
 
           <FacebookShareButton
             url={this.state.url}
-            title={'Details of selected videos'}
+               title={'URL'}
             className="Demo__some-network__share-button"
           >
             <FacebookIcon size={32} round />
@@ -439,7 +451,7 @@ export default class ViewVideo extends PureComponent {
 
           <LineShareButton
             url={this.state.url}
-            title={'Details of selected videos'}
+               title={'URL'}
             className="Demo__some-network__share-button"
           >
             <LineIcon size={32} round />
@@ -448,7 +460,7 @@ export default class ViewVideo extends PureComponent {
 
           <RedditShareButton
             url={this.state.url}
-            title={'Details of selected videos'}
+               title={'URL'}
             className="Demo__some-network__share-button"
           >
             <RedditIcon size={32} round />
@@ -456,7 +468,7 @@ export default class ViewVideo extends PureComponent {
 
           <TelegramShareButton
             url={this.state.url}
-            title={'Details of selected videos'}
+            title={'URL'}
             className="Demo__some-network__share-button"
           >
             <TelegramIcon size={32} round />
@@ -466,7 +478,7 @@ export default class ViewVideo extends PureComponent {
 
           <WhatsappShareButton
             url={this.state.url}
-            title={'Details of selected videos'}
+            title={'URL'}
             className="Demo__some-network__share-button"
           >
             <WhatsappIcon size={32} round />
@@ -525,3 +537,16 @@ export default class ViewVideo extends PureComponent {
     )
   }
 }
+ViewVideo.propTypes = {
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(
+  mapStateToProps
+)(ViewVideo);
