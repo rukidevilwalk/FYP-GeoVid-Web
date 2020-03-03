@@ -50,9 +50,10 @@ class ViewVideo extends PureComponent {
         count: urlString.length,
         luminosity: "bright"
       }),
-      bookmarked: [],
+      shared: [],
       url: '',
-      errors:{}
+      errors: {},
+      bookmarked: []
     }
 
   }
@@ -61,7 +62,7 @@ class ViewVideo extends PureComponent {
 
 
   UNSAFE_componentWillReceiveProps(nextProps) {
- 
+
     if (nextProps.errors) {
       this.setState({
         errors: nextProps.errors
@@ -112,17 +113,16 @@ class ViewVideo extends PureComponent {
                     selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo, startAddress: startAddress, endAddress: endAddress })
                   }
                 })
-                this.setState({ videoInfo: selectedVideos })
-                this.getTimeStamps()
+                axios.get("http://localhost:8000/bookmarks" + this.props.auth.user.email).then(response => {
+                  this.setState({ bookmarked: response.data })
+                  this.setState({ videoInfo: selectedVideos })
+                  this.getTimeStamps()
+                })
+            
+
+              
               })
-
           })
-
-
-
-
-
-
       })
 
     }).catch(function (thrown) {
@@ -224,19 +224,19 @@ class ViewVideo extends PureComponent {
   }
 
   // Set the directionIndex of a video based on filename
-  handleAddBookmark = (videotitle, start) => {
+  handleAddShare = (videotitle, start) => {
 
     let indexFound = this.findIndexOfVideo(videotitle, 2)
     let tempArr = []
 
     if (indexFound !== -1) {
 
-      tempArr = [...this.state.bookmarked]
+      tempArr = [...this.state.shared]
       tempArr[indexFound].start = start
 
     } else {
 
-      tempArr = [...this.state.bookmarked]
+      tempArr = [...this.state.shared]
       tempArr.push({ videotitle: videotitle, start: start })
 
     }
@@ -254,12 +254,12 @@ class ViewVideo extends PureComponent {
     })
 
     tempUrl = "http://localhost:3000/watch/" + tempUrl
-    this.setState({ bookmarked: tempArr })
+    this.setState({ shared: tempArr })
     this.setState({ url: tempUrl })
 
   }
 
-  handleRemoveBookmark = (videotitle) => {
+  handleRemoveShare = (videotitle) => {
 
     let indexFound = this.findIndexOfVideo(videotitle, 2)
     let tempArr = []
@@ -267,7 +267,7 @@ class ViewVideo extends PureComponent {
 
     if (indexFound !== -1) {
 
-      tempArr = [...this.state.bookmarked]
+      tempArr = [...this.state.shared]
 
       tempArr = tempArr.filter(function (obj) {
         return obj.videotitle !== videotitle
@@ -292,7 +292,7 @@ class ViewVideo extends PureComponent {
         tempUrl = "http://localhost:3000" + this.props.location.pathname + this.props.location.search
 
       }
-      this.setState({ bookmarked: tempArr })
+      this.setState({ shared: tempArr })
       this.setState({ url: tempUrl })
 
     }
@@ -312,9 +312,9 @@ class ViewVideo extends PureComponent {
         }
       })
 
-    } else {
+    } else if (type === 2) {
 
-      this.state.bookmarked.find(function (item, i) {
+      this.state.shared.find(function (item, i) {
 
         if (item.videotitle === val) {
           index = i
@@ -322,6 +322,14 @@ class ViewVideo extends PureComponent {
         }
       })
 
+    } else {
+      this.state.bookmarked.find(function (item, i) {
+
+        if (item.filename === val) {
+          index = i
+          return i
+        }
+      })
     }
 
     return index
@@ -426,7 +434,7 @@ class ViewVideo extends PureComponent {
         <div className="Demo__some-network">
           <EmailShareButton
             url={this.state.url}
-               title={'URL'}
+            title={'URL: '}
             className="Demo__some-network__share-button"
           >
             <EmailIcon size={32} round />
@@ -435,7 +443,7 @@ class ViewVideo extends PureComponent {
 
           <TwitterShareButton
             url={this.state.url}
-               title={'URL'}
+            title={'URL: '}
             className="Demo__some-network__share-button"
           >
             <TwitterIcon size={32} round />
@@ -443,7 +451,7 @@ class ViewVideo extends PureComponent {
 
           <FacebookShareButton
             url={this.state.url}
-               title={'URL'}
+            title={'URL: '}
             className="Demo__some-network__share-button"
           >
             <FacebookIcon size={32} round />
@@ -451,7 +459,7 @@ class ViewVideo extends PureComponent {
 
           <LineShareButton
             url={this.state.url}
-               title={'URL'}
+            title={'URL: '}
             className="Demo__some-network__share-button"
           >
             <LineIcon size={32} round />
@@ -460,7 +468,7 @@ class ViewVideo extends PureComponent {
 
           <RedditShareButton
             url={this.state.url}
-               title={'URL'}
+            title={'URL: '}
             className="Demo__some-network__share-button"
           >
             <RedditIcon size={32} round />
@@ -468,7 +476,7 @@ class ViewVideo extends PureComponent {
 
           <TelegramShareButton
             url={this.state.url}
-            title={'URL'}
+            title={'URL: '}
             className="Demo__some-network__share-button"
           >
             <TelegramIcon size={32} round />
@@ -478,7 +486,7 @@ class ViewVideo extends PureComponent {
 
           <WhatsappShareButton
             url={this.state.url}
-            title={'URL'}
+            title={'URL: '}
             className="Demo__some-network__share-button"
           >
             <WhatsappIcon size={32} round />
@@ -513,7 +521,7 @@ class ViewVideo extends PureComponent {
 
         <div className="row col-11 pt-2 mx-auto justify-content-left align-items-left">
           {this.state.videoInfo.map((video, index) => {
-
+            let isBookmarked = this.findIndexOfVideo(video.filename, 3)
             return this.state.mapIsRendered && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
 
               <VideoPlayer
@@ -524,9 +532,10 @@ class ViewVideo extends PureComponent {
                 endAddress={video.endAddress}
                 videoname={(video.filename)}
                 color={this.state.colorArr[index]}
-                handleAddBookmark={this.handleAddBookmark}
+                handleAddShare={this.handleAddShare}
+                isBookmarked={isBookmarked !== -1}
                 email={this.props.auth.user.email}
-                handleRemoveBookmark={this.handleRemoveBookmark}
+                handleRemoveShare={this.handleRemoveShare}
                 directionIndexHandler={this.directionIndexHandler}
                 ref={instance => this.refsCollection[video.filename] = instance}
               />

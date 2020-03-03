@@ -73,7 +73,7 @@ function valuetext(value) {
 }
 
 
- export default class VideoPlayer extends PureComponent {
+export default class VideoPlayer extends PureComponent {
   constructor(props) {
     super(props)
 
@@ -85,7 +85,7 @@ function valuetext(value) {
       duration: '00:00:00',
       value: 0,
       share_checked: false,
-      bookmark_checked: false,
+      bookmark_checked: this.props.isBookmarked,
       startTime: 0,
       showInfo: false,
       loggedIn: false
@@ -162,50 +162,52 @@ function valuetext(value) {
 
   handleShareChecked = event => {
     if (!this.state.share_checked) {
-      this.props.handleAddBookmark(this.props.videoname, this.state.value)
+      this.props.handleAddShare(this.props.videoname, this.state.value)
 
     } else {
-      this.props.handleRemoveBookmark(this.props.videoname)
+      this.props.handleRemoveShare(this.props.videoname)
     }
     this.setState({ share_checked: event.target.checked })
 
 
   }
 
-  
+
   handleBookmarkChecked = event => {
 
     //checked
     if (!this.state.bookmark_checked) {
 
-axios
-  .post("http://localhost:8000/bookmarks"  , {
-    email: this.props.email,
-    filename: this.props.videoname
-    })
-  .then(res => {
-    // then print response status
-  })
-  .catch(err => {
-    // then print response status
+      axios
+        .post("http://localhost:8000/bookmarks", {
+          email: this.props.email,
+          filename: this.props.videoname
+        })
+        .then(res => {
+          // then print response status
+        })
+        .catch(err => {
+          // then print response status
 
-  })
+        })
 
     } else {
       axios
-      .delete("http://localhost:8000/bookmarks"  , {
-        params: 
-        { email: this.props.email,
-          filename: this.props.videoname}
+        .delete("http://localhost:8000/bookmarks", {
+          params:
+          {
+            email: this.props.email,
+            filename: this.props.videoname
+          }
         })
-      .then(res => {
-        // then print response status
-    
-      })
-      .catch(err => {
-        // then print response status
-  
-      })
+        .then(res => {
+          // then print response status
+
+        })
+        .catch(err => {
+          // then print response status
+
+        })
     }
 
     this.setState({ bookmark_checked: event.target.checked })
@@ -238,7 +240,7 @@ axios
         </DialogContent>
 
         <DialogActions>
-        <Form>
+          <Form>
             <Form.Check
               type="switch"
               id="bookmark-switch"
