@@ -1,4 +1,4 @@
-Geotagging Moving Video
+Final Year Project: Geotagging Moving Video
 
 Web Application
 
