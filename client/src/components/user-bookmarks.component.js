@@ -89,7 +89,7 @@ class UserBookmarks extends PureComponent {
     }
 
     axios
-      .get("http://localhost:8000/bookmarks" + this.props.auth.user.name)
+      .get("http://localhost:8000/bookmarks" + this.props.auth.user.email)
       .then(res => {
         let tempArr = []
         let subtitleStr = ""

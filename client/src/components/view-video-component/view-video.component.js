@@ -525,6 +525,7 @@ class ViewVideo extends PureComponent {
                 videoname={(video.filename)}
                 color={this.state.colorArr[index]}
                 handleAddBookmark={this.handleAddBookmark}
+                email={this.props.auth.user.email}
                 handleRemoveBookmark={this.handleRemoveBookmark}
                 directionIndexHandler={this.directionIndexHandler}
                 ref={instance => this.refsCollection[video.filename] = instance}

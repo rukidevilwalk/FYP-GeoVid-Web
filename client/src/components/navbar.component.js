@@ -16,6 +16,7 @@ class Navbar extends Component {
     componentDidMount() {
         // If logged in and user navigates to Login page, should redirect them to dashboard
         if (this.props.auth.isAuthenticated) {
+      
             this.setState({ loggedIn: true })
 
         }
@@ -71,7 +72,7 @@ class Navbar extends Component {
 
                                     {(this.state.loggedIn &&
                                         <li className="navbar-item">
-                                            <p className="font-weight-bold" id="user"> Logged in as: {this.props.auth.user.name}</p>
+                                            <p className="font-weight-bold" id="user"> Logged in as: {this.props.auth.user.email}</p>
                                         </li>)}
 
                                     {(!this.state.loggedIn &&

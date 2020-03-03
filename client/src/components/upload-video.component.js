@@ -131,13 +131,12 @@ class UploadVideo extends Component {
       } else {
         data.append("file", this.state.selectedFile[x])
       }
-      data.set("user",this.props.auth.user.name)
  
-     // data.set("filename",this.props.auth.user.name)
+     // data.set("filename",this.props.auth.user.email)
     }
     let config = { headers: { "Content-Type": "multipart/form-data" } }
     axios
-      .post("http://localhost:8000/upload", data, config, {
+      .post("http://localhost:8000/upload"+this.props.auth.user.email, data, config, {
         onUploadProgress: ProgressEvent => {
           this.setState({
             loaded: (ProgressEvent.loaded / ProgressEvent.total) * 100

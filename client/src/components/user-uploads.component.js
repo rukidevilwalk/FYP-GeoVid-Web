@@ -89,7 +89,7 @@ class UserUploads extends PureComponent {
     }
 
     axios
-      .get("http://localhost:8000/uploads" + this.props.auth.user.name)
+      .get("http://localhost:8000/uploads" + this.props.auth.user.email)
       .then(res => {
         let tempArr = []
         let subtitleStr = ""

@@ -73,7 +73,7 @@ function valuetext(value) {
 }
 
 
- class VideoPlayer extends PureComponent {
+ export default class VideoPlayer extends PureComponent {
   constructor(props) {
     super(props)
 
@@ -94,25 +94,7 @@ function valuetext(value) {
 
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.auth.isAuthenticated) {
-        this.setState({ loggedIn: true })
-    } else {
-        this.setState({ loggedIn: false })
-    }
-
-    if (nextProps.errors) {
-        this.setState({
-            errors: nextProps.errors
-        });
-    }
-}
-
   componentDidMount() {
-
-    if (this.props.auth.isAuthenticated) {
-      this.setState({ loggedIn: true })
-  }
 
     if (this.props.videoname.charAt(32) === '&') {
       let tempStr = this.props.videoname.substring(33)
@@ -198,7 +180,7 @@ function valuetext(value) {
 
 axios
   .post("http://localhost:8000/bookmarks"  , {
-    user: this.props.auth.user.name,
+    email: this.props.email,
     filename: this.props.videoname
     })
   .then(res => {
@@ -213,7 +195,7 @@ axios
       axios
       .delete("http://localhost:8000/bookmarks"  , {
         params: 
-        { user: this.props.auth.user.name,
+        { email: this.props.email,
           filename: this.props.videoname}
         })
       .then(res => {
@@ -353,16 +335,3 @@ axios
     )
   }
 }
-VideoPlayer.propTypes = {
-  auth: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired
-};
-
-const mapStateToProps = state => ({
-  auth: state.auth,
-  errors: state.errors
-});
-
-export default connect(
-  mapStateToProps
-)(VideoPlayer);

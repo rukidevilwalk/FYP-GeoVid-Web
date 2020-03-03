@@ -106,7 +106,7 @@ const storage = new GridFsStorage({
 
 const upload = multer({ storage }).any();
 
-router.post('/upload', (req, res) => {
+router.post('/upload:email', (req, res) => {
 
   try {
     upload(req, res, function (err) {
@@ -115,12 +115,19 @@ router.post('/upload', (req, res) => {
         console.log(err);
         return res.end("Error uploading file.");
       } else {
-        newUpload = new uploads({
-          user: req.body.user,
-          filename: res.req.files[0].filename
+        uploads.find({ email: req.params.email, filename: res.req.files[0].filename }, function (err, file) {
+          if (!file || file.length === 0) {
+            newUpload = new uploads({
+              email: req.params.email,
+              filename: res.req.files[0].filename
+            })
+            newUpload.save()
+           
+          }
+          return res.end("File has been uploaded");
+
         })
-        newUpload.save()
-        return res.end("File has been uploaded");
+ 
       }
     });
   } catch (error) {
@@ -129,24 +136,24 @@ router.post('/upload', (req, res) => {
 
 });
 
-router.get('/uploads:user', (req, res) => {
+router.get('/uploads:email', (req, res) => {
   try {
-    uploads.find({user: req.params.user}, function (err, uploads) {
+    uploads.find({ email: req.params.email }, function (err, uploads) {
       res.send(uploads)
     });
- 
+
   } catch (error) {
     console.log(error)
   }
 
 });
 
-router.get('/bookmarks:user', (req, res) => {
+router.get('/bookmarks:email', (req, res) => {
   try {
-    bookmarks.find({user: req.params.user}, function (err, bookmarks) {
+    bookmarks.find({ email: req.params.email }, function (err, bookmarks) {
       res.send(bookmarks)
     });
- 
+
   } catch (error) {
     console.log(error)
   }
@@ -156,30 +163,28 @@ router.get('/bookmarks:user', (req, res) => {
 
 router.post('/bookmarks', (req, res) => {
 
-  console.log(req.body.user +' '+req.body.filename)
-  bookmarks.find({user: req.body.user,filename:req.body.filename}, function (err, file) {
+  bookmarks.find({ email: req.body.email, filename: req.body.filename }, function (err, file) {
     if (!file || file.length === 0) {
 
-  newBookmark = new bookmarks({
-    user: req.body.user,
-    filename: req.body.filename
-  })
-  newBookmark.save()
-  return res.end("File has been uploaded");
- }
+      newBookmark = new bookmarks({
+        email: req.body.email,
+        filename: req.body.filename
+      })
+      newBookmark.save()
+      return res.end("File has been uploaded");
+    }
   });
-  
+
 });
 
 router.delete('/bookmarks', (req, res) => {
 
-console.log(req.query.user +' '+req.query.filename)
-  bookmarks.findOneAndDelete({user: req.query.user,filename:req.query.filename}, function (err, file) {
-  
-  return res.end("File deleted");
- 
+  bookmarks.findOneAndDelete({ email: req.query.email, filename: req.query.filename }, function (err, file) {
+
+    return res.end("File deleted");
+
   });
-  
+
 });
 
 router.get('/search', (req, res) => {
