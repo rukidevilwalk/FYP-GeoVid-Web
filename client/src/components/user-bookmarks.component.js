@@ -245,7 +245,7 @@ tempUrl = ''
       <Fragment>
         <div className="row col-11 mx-auto">
         <div className="col-8 py-auto my-auto">
-        <h3>Uploads</h3>
+        <h3>Bookmarks</h3>
         </div>
         <div className="col-2  py-auto my-auto">
           {this.renderRedirect()}
