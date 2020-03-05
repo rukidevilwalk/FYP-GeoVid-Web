@@ -4,7 +4,7 @@ import VideoMap from "./video-map.component"
 import { Button } from 'reactstrap'
 import PropTypes from "prop-types";
 import axios from "axios"
-import randomColor from 'randomcolor'
+import distinctColors from 'distinct-colors'
 import { connect } from "react-redux";
 import {
   EmailShareButton,
@@ -46,9 +46,10 @@ class ViewVideo extends PureComponent {
       defaultValue: "0",
       videoArr: urlString,
       directionIndex: [],
-      colorArr: randomColor({
+      colorArr: distinctColors({
         count: urlString.length,
-        luminosity: "bright"
+        hueMin:200,
+        lightMin:50
       }),
       appliedColorArr: [],
       shared: [],
@@ -126,8 +127,7 @@ class ViewVideo extends PureComponent {
                     let dateFrom = convertStringToDate(data[0].date)
                     let dateTo = convertStringToDate(data[data.length - 1].date)
                     selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo, startAddress: startAddress, endAddress: endAddress })
-
-
+       
                     tempColorArr.push({ filename: filename, color: this.state.colorArr[index] })
                   }
                 })
@@ -532,7 +532,7 @@ class ViewVideo extends PureComponent {
 
         <div className="row col-11 mx-auto">
           <div className="ml-0 pl-0 col-10 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
-            {this.state.appliedColorArr.length == this.state.videoArr.length && <VideoMap
+            {this.state.appliedColorArr.length === this.state.videoArr.length && <VideoMap
               videos={this.state.videoArr}
               colorArr={this.state.colorArr}
               appliedColorArr={this.state.appliedColorArr}
@@ -550,7 +550,7 @@ class ViewVideo extends PureComponent {
           {this.state.videoInfo.map((video, index) => {
             let isBookmarked = this.findIndexOfVideo(video.filename, 3)
             let colorIndex = this.findIndexOfVideo(video.filename, 4)
-            return this.state.mapIsRendered && this.state.appliedColorArr.length == this.state.videoArr.length && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
+            return this.state.mapIsRendered && this.state.appliedColorArr.length === this.state.videoArr.length && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
 
               <VideoPlayer
                 key={index}

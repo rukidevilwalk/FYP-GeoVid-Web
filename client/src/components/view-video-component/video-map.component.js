@@ -95,7 +95,7 @@ export default class VideoMap extends PureComponent {
         let index = -1
 
         this.props.appliedColorArr.find(function (item, i) {
-            if (item.filename === val) {
+            if (item.filename.substring(0, 32) === val.substring(0, 32)) {
                 index = i
                 return i
             }
@@ -106,7 +106,9 @@ export default class VideoMap extends PureComponent {
 
     renderPaths = () => {
         return (this.state.map_path.map((data, index) => {
+
             let colorIndex = this.findIndexOfVideo(this.state.subtitle_file[index][0].filename)
+
             return <Polyline
                 key={index}
                 path={data}
@@ -132,8 +134,10 @@ export default class VideoMap extends PureComponent {
         //console.log(this.state.directionVectors)
         return (this.state.directionVectors.map((data, i) => {
             let notdone = true
-
+            let colorIndex = this.findIndexOfVideo(this.state.subtitle_file[i][0].filename)
             return (data.map((coords, i) => {
+                
+          
                 if (notdone) {
                     let index = this.props.findIndexOfVideo(coords.filename, 1)
 
@@ -157,10 +161,10 @@ export default class VideoMap extends PureComponent {
                                     { lat: coords.right.lat, lng: coords.right.lng }
                                 ]}
                                 options={{
-                                    strokeColor: "#FF0000",
+                                    strokeColor: "black",
                                     strokeOpacity: 0.8,
                                     strokeWeight: 2,
-                                    fillColor: "lightblue",
+                                    fillColor:  this.props.appliedColorArr[colorIndex].color,
                                     fillOpacity: 1,
                                     clickable: false,
                                     draggable: false,
@@ -179,9 +183,9 @@ export default class VideoMap extends PureComponent {
                                     { lat: coords.right.lat, lng: coords.right.lng }
                                 ]}
                                 options={{
-                                    fillColor: "lightblue",
-                                    fillOpacity: 1,
-                                    strokeColor: "red",
+                                    fillColor:  this.props.appliedColorArr[colorIndex].color,
+                                    fillOpacity: 0.5,
+                                    strokeColor:  this.props.appliedColorArr[colorIndex].color,
                                     strokeOpacity: 0,
                                     strokeWeight: 2,
                                     clickable: false,

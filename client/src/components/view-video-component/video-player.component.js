@@ -1,12 +1,9 @@
 import React, { Fragment, PureComponent } from "react"
 import {
   Player,
-  ControlBar,
-  // ProgressControl 
+  ControlBar
 } from 'video-react'
 import axios from "axios"
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
 import AddButton from './add-button.component';
 import InfoButton from './info-button.component';
 import Dialog from '@material-ui/core/Dialog';
@@ -99,6 +96,7 @@ export default class VideoPlayer extends PureComponent {
     if (this.props.videoname.charAt(32) === '&') {
       let tempStr = this.props.videoname.substring(33)
       let startTime = tempStr.substring(2)
+
       this.setState({ startTime: parseInt(startTime) })
     }
 
@@ -162,10 +160,11 @@ export default class VideoPlayer extends PureComponent {
 
   handleShareChecked = event => {
     if (!this.state.share_checked) {
-      this.props.handleAddShare(this.props.videoname, this.state.value)
+
+      this.props.handleAddShare(this.props.videoname.substring(0,32), this.state.value)
 
     } else {
-      this.props.handleRemoveShare(this.props.videoname)
+      this.props.handleRemoveShare(this.props.videoname.substring(0,32))
     }
     this.setState({ share_checked: event.target.checked })
 
@@ -181,7 +180,7 @@ export default class VideoPlayer extends PureComponent {
       axios
         .post("http://localhost:8000/bookmarks", {
           email: this.props.email,
-          filename: this.props.videoname
+          filename: this.props.videoname.substring(0,32)
         })
         .then(res => {
           // then print response status
@@ -197,7 +196,7 @@ export default class VideoPlayer extends PureComponent {
           params:
           {
             email: this.props.email,
-            filename: this.props.videoname
+            filename: this.props.videoname.substring(0,32)
           }
         })
         .then(res => {
