@@ -147,7 +147,8 @@ export default class VideoPlayer extends PureComponent {
   };
 
   handleChange = (event, newValue) => {
-
+    this.setState({ share_checked: false })
+    this.props.handleRemoveShare(this.props.videoname.substring(0, 32))
     var measuredStart = new Date(null);
     measuredStart.setSeconds(newValue); // specify value of SECONDS
     var MSHStart = measuredStart.toISOString().substr(11, 8);
@@ -161,10 +162,10 @@ export default class VideoPlayer extends PureComponent {
   handleShareChecked = event => {
     if (!this.state.share_checked) {
 
-      this.props.handleAddShare(this.props.videoname.substring(0,32), this.state.value)
+      this.props.handleAddShare(this.props.videoname.substring(0, 32), this.state.value)
 
     } else {
-      this.props.handleRemoveShare(this.props.videoname.substring(0,32))
+      this.props.handleRemoveShare(this.props.videoname.substring(0, 32))
     }
     this.setState({ share_checked: event.target.checked })
 
@@ -180,7 +181,7 @@ export default class VideoPlayer extends PureComponent {
       axios
         .post("http://localhost:8000/bookmarks", {
           email: this.props.email,
-          filename: this.props.videoname.substring(0,32)
+          filename: this.props.videoname.substring(0, 32)
         })
         .then(res => {
           // then print response status
@@ -196,7 +197,7 @@ export default class VideoPlayer extends PureComponent {
           params:
           {
             email: this.props.email,
-            filename: this.props.videoname.substring(0,32)
+            filename: this.props.videoname.substring(0, 32)
           }
         })
         .then(res => {

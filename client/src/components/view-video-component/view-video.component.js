@@ -24,6 +24,7 @@ import {
 } from "react-share";
 import { convertStringToDate, convertSubSearch, } from "../helper"
 import Geocode from "react-geocode"
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const CancelToken = axios.CancelToken
 let source
@@ -48,12 +49,13 @@ class ViewVideo extends PureComponent {
       directionIndex: [],
       colorArr: distinctColors({
         count: urlString.length,
-        hueMin:200,
-        lightMin:50
+        hueMin: 200,
+        lightMin: 50
       }),
       appliedColorArr: [],
       shared: [],
       url: '',
+      copied: false,
       errors: {},
       bookmarked: [],
       loggedIn: false
@@ -127,7 +129,7 @@ class ViewVideo extends PureComponent {
                     let dateFrom = convertStringToDate(data[0].date)
                     let dateTo = convertStringToDate(data[data.length - 1].date)
                     selectedVideos.push({ filename: filename, dateFrom: dateFrom, dateTo: dateTo, startAddress: startAddress, endAddress: endAddress })
-       
+
                     tempColorArr.push({ filename: filename, color: this.state.colorArr[index] })
                   }
                 })
@@ -518,6 +520,15 @@ class ViewVideo extends PureComponent {
           >
             <WhatsappIcon size={32} round />
           </WhatsappShareButton>
+
+          <CopyToClipboard text={this.state.url}
+            onCopy={() => this.setState({ copied: true })}>
+            <button data-toggle="tooltip" data-placement="top" title="Copy to clipboard" className="btn-floating btn-small waves-effect waves-light" type="submit" name="action">
+              <i className="material-icons">content_copy</i>
+            </button>
+          </CopyToClipboard>
+
+
         </div>
 
       </div>)
