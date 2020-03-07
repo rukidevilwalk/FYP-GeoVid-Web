@@ -7,6 +7,7 @@
 		"@material-ui/icons": "^4.9.1",
 		"@material-ui/styles": "^4.9.0",
 		"axios": "^0.19.2",
+		"distinct-colors": "^2.1.0",
 		"geolocation-utils": "^1.2.2",
 		"jwt-decode": "^2.2.0",
 		"materialize-css": "^1.0.0-rc.2",
