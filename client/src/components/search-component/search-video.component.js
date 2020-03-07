@@ -47,7 +47,7 @@ class Homepage extends PureComponent {
             geoAddress: [],
             dateTo: new Date(),
             dateFrom: new Date(),
-            radiusSize: 2000,
+            radiusSize: 200,
             isToggled: false,
             renderCircle: false,
             radius: 0,
@@ -100,606 +100,618 @@ class Homepage extends PureComponent {
 
         } else {
             this.props.history.push("/login");
-        this.setState({ loggedIn: false })
-    }
-
-    if(nextProps.errors) {
-        this.setState({
-            errors: nextProps.errors
-        });
-    }
-}
-
-componentDidMount() {
-
-    if (this.props.auth.isAuthenticated) {
-        this.setState({ loggedIn: true })
-
-        axios.get("http://localhost:8000/uploads" + this.props.auth.user.email)
-            .then(response => {
-
-                let tempUploads = []
-                response.data.forEach(function (upload) {
-                    tempUploads.push(upload.filename)
-                })
-                this.setState({ userUploads: tempUploads })
-
-            }).catch(function (thrown) {
-
-                console.log(thrown)
-
-            })
-    }
-    this.setAPILoaded()
-    if (source) {
-        source.cancel('Operation canceled by the user.')
-    }
-    source = CancelToken.source()
-    axios.get("http://localhost:8000/search", {
-        cancelToken: source.token
-    }).then(response => {
-
-        this.setState({ videolist: convertSubSearch(response.data) })
-        this.setState({ markerPaths: createPath(convertSub(response.data)) })
-        this.getAddrFromLatLng()
-
-    }).catch(function (thrown) {
-        if (axios.isCancel(thrown)) {
-            console.log('Request canceled', thrown.message)
-        } else {
-            console.log(thrown)
+            this.setState({ loggedIn: false })
         }
-    })
 
-}
-
-renderRedirect = () => {
-
-    this.urlString = ''
-    let tempArr = this.selectedVideos
-
-    if (tempArr.length !== 0) {
-        Object.keys(tempArr).map(key => {
-            this.urlString += ('?' + tempArr[key].filename)
-            return true
-        })
-
-        this.urlString = this.urlString.substring(1)
-
-        this.setState({ redirect: true })
-    } else {
-        alert('Please select at least one video!')
-    }
-}
-
-//DateTime Picker fuctions
-
-handleDateTimeFrom = (date) => {
-    this.setState({ dateFrom: date })
-}
-
-handleDateTimeTo = (date) => {
-    this.setState({ dateTo: date })
-}
-
-// Autocomplete functions
-handleChange = address => {
-
-    this.setState({
-        address,
-        errorMessage: '',
-    })
-}
-
-handleSelect = selected => {
-    this.setState({ isGeocoding: true, address: selected })
-    geocodeByAddress(selected)
-        .then(res => getLatLng(res[0]))
-        .then(({ lat, lng }) => {
+        if (nextProps.errors) {
             this.setState({
-                latitude: lat,
-                longitude: lng,
-                isGeocoding: false,
-            })
-            this.map.panTo({ lat: this.state.latitude, lng: this.state.longitude })
-            this.map.setZoom(14)
-            //this.fitBounds()
-        })
-        .catch(error => {
-            this.setState({ isGeocoding: false })
-            console.log('error', error) // eslint-disable-line no-console
-        })
-
-}
-
-handleCloseClick = () => {
-    this.setState({
-        address: '',
-        latitude: null,
-        longitude: null,
-    })
-}
-
-// Flag to render map only after Google API has loaded
-setAPILoaded = () => {
-    if (!this.state.isLoaded)
-        this.setState({ isLoaded: true })
-}
-
-// Circle functions
-
-handleRadiusChange = (event) => {
-
-    if (this.radius !== undefined) {
-        console.log(event)
-        this.radius.setRadius(parseInt(event.target.value))
-
-    }
-}
-
-
-handleRadiusSlider = (event) => {
-    if (this.radius !== undefined) {
-        this.radius.setRadius(parseInt(event.target.value))
-        //this.setState({ radiusSize: parseInt(event.target.value) })
-    }
-
-}
-
-removeSelectedVideos = (value) => {
-    //console.log('Removing from selectedVideos:' + value)
-    this.selectedVideos = this.selectedVideos.filter(function (obj) {
-        return obj.filename !== value
-    })
-}
-
-addSelectedVideos = (value, dateFrom, dateTo) => {
-
-    let indexFound = this.findIndexOfVideo(this.selectedVideos, value)
-
-    if (indexFound === -1) {
-        // console.log('Adding to selectedVideos:' + value)
-        this.selectedVideos.push({ filename: value, dateFrom: dateFrom, dateTo: dateTo })
-    }
-
-}
-
-findIndexOfVideo = (object, val) => {
-    let index = -1
-    object.find(function (item, i) {
-        if (item.filename === val) {
-            index = i
-            return i
+                errors: nextProps.errors
+            });
         }
-    })
-    return index
-}
+    }
 
-checkInsideCirle = () => {
+    componentDidMount() {
 
-    // Circle and markers must have been rendered
-    if (this.radius !== undefined && typeof this.refsCollection !== 'undefined') {
+        if (this.props.auth.isAuthenticated) {
+            this.setState({ loggedIn: true })
 
-        var checkRadius = false
-        var coordInsideCircle = false
+            axios.get("http://localhost:8000/uploads" + this.props.auth.user.email)
+                .then(response => {
 
-        if (this.state.filterChanged || this.state.isToggled || (this.state.radiusLatitude !== this.radius.getCenter().lat() || this.state.radiusLongitude !== this.radius.getCenter().lng())
-            || (this.state.radiusSize !== this.radius.getRadius())
-        ) {
-
-
-            if (this.state.radiusSize !== this.radius.getRadius()) {
-                if (this.radius.getRadius() > 12000) {
-
-                    this.setState({ radiusSize: 12000 })
-
-                    this.radius.setRadius(12000)
-
-                } else if (this.radius.getRadius() < 2000) {
-
-                    this.setState({ radiusSize: 2000 })
-                    this.radius.setRadius(2000)
-
-                } else {
-                    this.setState({
-                        radiusSize: this.radius.getRadius()
+                    let tempUploads = []
+                    response.data.forEach(function (upload) {
+                        tempUploads.push(upload.filename)
                     })
+                    this.setState({ userUploads: tempUploads })
 
-                }
+                }).catch(function (thrown) {
 
-            }
+                    console.log(thrown)
 
-            if (this.state.isToggled || (this.state.radiusLatitude !== this.radius.getCenter().lat() || this.state.radiusLongitude !== this.radius.getCenter().lng())) {
-                this.setState({
-                    radiusLatitude: this.radius.getCenter().lat(),
-                    radiusLongitude: this.radius.getCenter().lng()
                 })
+        }
+        this.setAPILoaded()
+        if (source) {
+            source.cancel('Operation canceled by the user.')
+        }
+        source = CancelToken.source()
+        axios.get("http://localhost:8000/search", {
+            cancelToken: source.token
+        }).then(response => {
+
+            this.setState({ videolist: convertSubSearch(response.data) })
+            this.setState({ markerPaths: createPath(convertSub(response.data)) })
+            this.getAddrFromLatLng()
+
+        }).catch(function (thrown) {
+            if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message)
+            } else {
+                console.log(thrown)
             }
+        })
 
+    }
 
-            // Don't run the check if no markers have been initialized
-            this.refsCollection.some(element => {
-                checkRadius = (element !== null)
-                return checkRadius
+    renderRedirect = () => {
+
+        this.urlString = ''
+        let tempArr = this.selectedVideos
+
+        if (tempArr.length !== 0) {
+            Object.keys(tempArr).map(key => {
+                this.urlString += ('?' + tempArr[key].filename)
+                return true
             })
-            this.setState({ filterChanged: false })
-            let count = -1
-            this.refsCollection.forEach(element => {
-                if (count === -1)
-                    count = 0
-                if (element !== null) {
-                    if (element.filename !== "") {
-                        count++
+
+            this.urlString = this.urlString.substring(1)
+
+            this.setState({ redirect: true })
+        } else {
+            alert('Please select at least one video!')
+        }
+    }
+
+    //DateTime Picker fuctions
+
+    handleDateTimeFrom = (date) => {
+        this.setState({ dateFrom: date })
+    }
+
+    handleDateTimeTo = (date) => {
+        this.setState({ dateTo: date })
+    }
+
+    // Autocomplete functions
+    handleChange = address => {
+
+        this.setState({
+            address,
+            errorMessage: '',
+        })
+    }
+
+    handleSelect = selected => {
+        this.setState({ isGeocoding: true, address: selected })
+        geocodeByAddress(selected)
+            .then(res => getLatLng(res[0]))
+            .then(({ lat, lng }) => {
+                this.setState({
+                    latitude: lat,
+                    longitude: lng,
+                    isGeocoding: false,
+                })
+                this.map.panTo({ lat: this.state.latitude, lng: this.state.longitude })
+                this.map.setZoom(14)
+                //this.fitBounds()
+            })
+            .catch(error => {
+                this.setState({ isGeocoding: false })
+                console.log('error', error) // eslint-disable-line no-console
+            })
+
+    }
+
+    handleCloseClick = () => {
+        this.setState({
+            address: '',
+            latitude: null,
+            longitude: null,
+        })
+    }
+
+    // Flag to render map only after Google API has loaded
+    setAPILoaded = () => {
+        if (!this.state.isLoaded)
+            this.setState({ isLoaded: true })
+    }
+
+    // Circle functions
+
+    handleRadiusChange = (event) => {
+
+        if (this.radius !== undefined) {
+            console.log(event)
+            this.radius.setRadius(parseInt(event.target.value))
+
+        }
+    }
+
+
+    handleRadiusSlider = (event) => {
+        if (this.radius !== undefined) {
+            this.radius.setRadius(parseInt(event.target.value))
+            //this.setState({ radiusSize: parseInt(event.target.value) })
+        }
+
+    }
+
+    removeSelectedVideos = (value) => {
+        //console.log('Removing from selectedVideos:' + value)
+        this.selectedVideos = this.selectedVideos.filter(function (obj) {
+            return obj.filename !== value
+        })
+    }
+
+    addSelectedVideos = (value, dateFrom, dateTo) => {
+
+        let indexFound = this.findIndexOfVideo(this.selectedVideos, value)
+
+        if (indexFound === -1) {
+            // console.log('Adding to selectedVideos:' + value)
+            this.selectedVideos.push({ filename: value, dateFrom: dateFrom, dateTo: dateTo })
+        }
+
+    }
+
+    findIndexOfVideo = (object, val) => {
+        let index = -1
+        object.find(function (item, i) {
+            if (item.filename === val) {
+                index = i
+                return i
+            }
+        })
+        return index
+    }
+
+    checkInsideCirle = () => {
+
+        // Circle and markers must have been rendered
+        if (this.radius !== undefined && typeof this.refsCollection !== 'undefined') {
+
+            var checkRadius = false
+            var coordInsideCircle = false
+
+            if (this.state.filterChanged || this.state.isToggled || (this.state.radiusLatitude !== this.radius.getCenter().lat() || this.state.radiusLongitude !== this.radius.getCenter().lng())
+                || (this.state.radiusSize !== this.radius.getRadius())
+            ) {
+
+
+                if (this.state.radiusSize !== this.radius.getRadius()) {
+                    if (this.radius.getRadius() > 5000) {
+
+                        this.setState({ radiusSize: 5000 })
+
+                        this.radius.setRadius(5000)
+
+                    } else if (this.radius.getRadius() < 200) {
+
+                        this.setState({ radiusSize: 200 })
+                        this.radius.setRadius(200)
+
+                    } else {
+                        this.setState({
+                            radiusSize: this.radius.getRadius()
+                        })
+
                     }
+
                 }
-            })
-            checkRadius = (count === this.count)
+
+                if (this.state.isToggled || (this.state.radiusLatitude !== this.radius.getCenter().lat() || this.state.radiusLongitude !== this.radius.getCenter().lng())) {
+                    this.setState({
+                        radiusLatitude: this.radius.getCenter().lat(),
+                        radiusLongitude: this.radius.getCenter().lng()
+                    })
+                }
+
+
+                // Don't run the check if no markers have been initialized
+                this.refsCollection.some(element => {
+                    checkRadius = (element !== null)
+                    return checkRadius
+                })
+                this.setState({ filterChanged: false })
+                let count = -1
+                this.refsCollection.forEach(element => {
+                    if (count === -1)
+                        count = 0
+                    if (element !== null) {
+                        if (element.filename !== "") {
+                            count++
+                        }
+                    }
+                })
+                checkRadius = (count === this.count)
 
 
 
-            if (checkRadius) {
-                this.selectedVideos = []
+                if (checkRadius) {
+                    this.selectedVideos = []
 
-                this.state.videolist.forEach((data, index) => {
+                    this.state.videolist.forEach((data, index) => {
 
-                    coordInsideCircle = false
-                    let dateFrom = convertStringToDate(data[0].date)
-                    let dateTo = convertStringToDate(data[data.length - 1].date)
+                        coordInsideCircle = false
+                        let dateFrom = convertStringToDate(data[0].date)
+                        let dateTo = convertStringToDate(data[data.length - 1].date)
 
-                    if (!this.state.onlyUserVideos || (this.state.onlyUserVideos && this.state.userUploads.includes(data[0].filename))) {
+                        if (!this.state.onlyUserVideos || (this.state.onlyUserVideos && this.state.userUploads.includes(data[0].filename))) {
 
-                        // Only check markers within the date range
-                        if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
+                            // Only check markers within the date range
+                            if (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo) {
 
-                            let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
+                                let centerOfCircle = { lat: this.radius.getCenter().lat(), lon: this.radius.getCenter().lng() }
 
-                            // Select marker if at least one coordinate is inside radius
-                            data.some((coord) => {
+                                // Select marker if at least one coordinate is inside radius
+                                data.some((coord) => {
 
-                                let markerCoord = { lat: parseFloat(coord.lat), lon: parseFloat(coord.lon) }
+                                    let markerCoord = { lat: parseFloat(coord.lat), lon: parseFloat(coord.lon) }
 
-                                coordInsideCircle = insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())
+                                    coordInsideCircle = insideCircle(markerCoord, centerOfCircle, this.radius.getRadius())
 
-                                return coordInsideCircle
+                                    return coordInsideCircle
 
-                            })
+                                })
 
-                            if (coordInsideCircle) {
+                                if (coordInsideCircle) {
 
-                                this.refsCollection[index].handleSelectMarker()
-                                this.addSelectedVideos(data[0].filename, dateFrom, dateTo)
+                                    this.refsCollection[index].handleSelectMarker()
+                                    this.addSelectedVideos(data[0].filename, dateFrom, dateTo)
 
-                            } else {
+                                } else {
 
-                                this.refsCollection[index].handleDeselectMarker()
-                                this.removeSelectedVideos(data[0].filename)
+                                    this.refsCollection[index].handleDeselectMarker()
+                                    this.removeSelectedVideos(data[0].filename)
+                                }
+
                             }
 
                         }
+                    })
 
-                    }
-                })
-
+                }
             }
+
+        } else {
+            // console.log('Circle not initialized')
         }
-
-    } else {
-        // console.log('Circle not initialized')
     }
-}
 
 
-handleOnlyUserVideos = (event) => {
-    this.setState({
-        onlyUserVideos: event.target.checked,
-        filterChanged: true
-    }, () => {
-        this.checkInsideCirle()
-    })
-}
-
-renderRadiusByClick = (event) => {
-    if (this.state.isToggled) {
+    handleOnlyUserVideos = (event) => {
         this.setState({
-            radiusLatitude: event.latLng.lat(),
-            radiusLongitude: event.latLng.lng()
+            onlyUserVideos: event.target.checked,
+            filterChanged: true
+        }, () => {
+            this.checkInsideCirle()
         })
+    }
 
-        this.checkInsideCirle()
+    renderRadiusByClick = (event) => {
+        if (this.state.isToggled) {
+            this.setState({
+                radiusLatitude: event.latLng.lat(),
+                radiusLongitude: event.latLng.lng()
+            })
 
+            this.checkInsideCirle()
+
+            this.setState(prevState => ({
+                isToggled: !prevState.isToggled
+            }))
+        }
+    }
+
+    handleRadiusToggle = (event) => {
         this.setState(prevState => ({
             isToggled: !prevState.isToggled
         }))
-    }
-}
 
-handleRadiusToggle = (event) => {
-    this.setState(prevState => ({
-        isToggled: !prevState.isToggled
-    }))
-
-}
-
-renderRadius = () => {
-    return ((<Circle
-        onLoad={radius => {
-            this.radius = radius
-        }}
-        center={{
-            lat: this.state.radiusLatitude,
-            lng: this.state.radiusLongitude
-        }}
-        radius={this.state.radiusSize}
-        draggable={true}
-        options={{
-            strokeColor: '#FF0000',
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            editable: true,
-            visible: true,
-            zIndex: 1
-        }}
-        onRadiusChanged={e => this.checkInsideCirle()}
-        onCenterChanged={e => this.checkInsideCirle()}
-    //onDragEnd={e => console.log('dragend')}
-    />))
-}
-
-// Map functions
-
-getAddrFromLatLng = () => {
-
-    this.state.videolist.forEach(video => {
-
-        Geocode.fromLatLng(video[0].lat, video[0].lon).then(
-            response => {
-                const address = response.results[0].formatted_address
-
-                this.setState(prevState => ({
-                    geoAddress: [...prevState.geoAddress, address]
-                }))
-            },
-            error => {
-                console.error(error)
-                return ("Address not found.")
-            }
-        )
-
-    })
-
-}
-
-fitBounds = () => {
-    if (this.state.longitude !== null) {
-        const bounds = new window.google.maps.LatLngBounds()
-        //console.log(this.radius.getBounds())
-        bounds.extend(this.radius.getBounds())
-        this.map.fitBounds(bounds)
     }
 
-}
+    renderRadius = () => {
+        return ((<Circle
+            onLoad={radius => {
+                this.radius = radius
+            }}
+            center={{
+                lat: this.state.radiusLatitude,
+                lng: this.state.radiusLongitude
+            }}
+            radius={this.state.radiusSize}
+            draggable={true}
+            options={{
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                editable: true,
+                visible: true,
+                zIndex: 1
+            }}
+            onRadiusChanged={e => this.checkInsideCirle()}
+            onCenterChanged={e => this.checkInsideCirle()}
+        //onDragEnd={e => console.log('dragend')}
+        />))
+    }
 
-setMarkerInfoWindow = markerIndex => {
-    let marker = this.state.videolist[markerIndex]
-    let dateFrom = convertStringToDate(marker[0].date)
-    let dateTo = convertStringToDate(marker[marker.length - 1].date)
+    // Map functions
 
-    this.setState({ markerAddress: this.state.geoAddress[markerIndex] })
-    this.setState({ markerLat: marker[0].lat })
-    this.setState({ markerLng: marker[0].lon })
-    this.setState({ markerDateFrom: dateFrom })
-    this.setState({ markerDateTo: dateTo })
-}
+    getAddrFromLatLng = () => {
 
-renderInfoMarkers = () => {
-    this.refsCollection = []
-    this.count = 0
-    return (this.state.videolist.map((data, index) => {
+        this.state.videolist.forEach(video => {
 
-        let dateFrom = convertStringToDate(data[0].date)
-        let dateTo = convertStringToDate(data[data.length - 1].date)
+            Geocode.fromLatLng(video[0].lat, video[0].lon).then(
+                response => {
+                    const address = response.results[0].formatted_address
 
-        if (!this.state.onlyUserVideos || (this.state.onlyUserVideos && this.state.userUploads.includes(data[0].filename))) {
-            ++this.count
+                    this.setState(prevState => ({
+                        geoAddress: [...prevState.geoAddress, address]
+                    }))
+                },
+                error => {
+                    console.error(error)
+                    return ("Address not found.")
+                }
+            )
 
-            return (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo && (<InfoMarker
-                key={index}
-                index={index}
-                filename={data[0].filename}
-                removeSelectedVideos={this.removeSelectedVideos}
-                addSelectedVideos={this.addSelectedVideos}
-                dateFrom={dateFrom}
-                dateTo={dateTo}
-                ref={instance => this.refsCollection[index] = instance}
-                pathdata={this.state.markerPaths[index]}
-                lat={parseFloat(data[0].lat)}
-                lng={parseFloat(data[0].lon)}
-                setMarkerInfoWindow={this.setMarkerInfoWindow}
-            />))
+        })
+
+    }
+
+    fitBounds = () => {
+        if (this.state.longitude !== null) {
+            const bounds = new window.google.maps.LatLngBounds()
+            //console.log(this.radius.getBounds())
+            bounds.extend(this.radius.getBounds())
+            this.map.fitBounds(bounds)
         }
-    }))
 
-}
+    }
 
-renderAutoComplete = () => {
+    setMarkerInfoWindow = markerIndex => {
+        let marker = this.state.videolist[markerIndex]
+        let dateFrom = convertStringToDate(marker[0].date)
+        let dateTo = convertStringToDate(marker[marker.length - 1].date)
 
-    const {
-        address,
-        // errorMessage,
-        //  latitude,
-        //  longitude,
-        // isGeocoding,
-    } = this.state
-    return (<PlacesAutocomplete
-        onChange={this.handleChange}
-        value={address}
-        onSelect={this.handleSelect}
-        onError={this.handleError}
-        shouldFetchSuggestions={address.length > 2}
-    >
-        {({ getInputProps, suggestions, getSuggestionItemProps }) => {
-            return (
-                <div className="Demo__search-bar-container">
-                    <div className="Demo__search-input-container">
+        this.setState({ markerAddress: this.state.geoAddress[markerIndex] })
+        this.setState({ markerLat: marker[0].lat })
+        this.setState({ markerLng: marker[0].lon })
+        this.setState({ markerDateFrom: dateFrom })
+        this.setState({ markerDateTo: dateTo })
+    }
 
-                        <input
-                            {...getInputProps({
-                                placeholder: 'Search Places...',
-                                className: 'Demo__search-input',
-                            })}
-                        />
+    renderInfoMarkers = () => {
+        this.refsCollection = []
+        this.count = 0
+        return (this.state.videolist.map((data, index) => {
 
-                        {this.state.address.length > 0 && (
-                            <button
-                                className="Demo__clear-button"
-                                onClick={this.handleCloseClick}
-                            >x</button>
+            let dateFrom = convertStringToDate(data[0].date)
+            let dateTo = convertStringToDate(data[data.length - 1].date)
+
+            if (!this.state.onlyUserVideos || (this.state.onlyUserVideos && this.state.userUploads.includes(data[0].filename))) {
+                ++this.count
+
+                return (dateFrom >= this.state.dateFrom && dateTo <= this.state.dateTo && (<InfoMarker
+                    key={index}
+                    index={index}
+                    filename={data[0].filename}
+                    removeSelectedVideos={this.removeSelectedVideos}
+                    addSelectedVideos={this.addSelectedVideos}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    ref={instance => this.refsCollection[index] = instance}
+                    pathdata={this.state.markerPaths[index]}
+                    lat={parseFloat(data[0].lat)}
+                    lng={parseFloat(data[0].lon)}
+                    setMarkerInfoWindow={this.setMarkerInfoWindow}
+                />))
+            }
+        }))
+
+    }
+
+    handleMapCenterChanged = () => {
+        if (this.map !== undefined) {
+            this.setState({
+                latitude: this.map.getCenter().lat(),
+                longitude: this.map.getCenter().lng()
+            })
+        }
+
+
+    }
+
+    renderAutoComplete = () => {
+
+        const {
+            address,
+            // errorMessage,
+            //  latitude,
+            //  longitude,
+            // isGeocoding,
+        } = this.state
+        return (<PlacesAutocomplete
+            onChange={this.handleChange}
+            value={address}
+            onSelect={this.handleSelect}
+            onError={this.handleError}
+            shouldFetchSuggestions={address.length > 2}
+        >
+            {({ getInputProps, suggestions, getSuggestionItemProps }) => {
+                return (
+                    <div className="Demo__search-bar-container">
+                        <div className="Demo__search-input-container">
+
+                            <input
+                                {...getInputProps({
+                                    placeholder: 'Search Places...',
+                                    className: 'Demo__search-input',
+                                })}
+                            />
+
+                            {this.state.address.length > 0 && (
+                                <button
+                                    className="Demo__clear-button"
+                                    onClick={this.handleCloseClick}
+                                >x</button>
+                            )}
+                        </div>
+
+                        {suggestions.length > 0 && (
+                            <div className="Demo__autocomplete-container">
+                                {suggestions.map(suggestion => {
+                                    const className = "Demo"
+
+                                    return (
+                                        /* eslint-disable react/jsx-key */
+                                        <div
+                                            {...getSuggestionItemProps(suggestion, { className })}
+                                        >
+                                            <strong>
+                                                {suggestion.formattedSuggestion.mainText}
+                                            </strong>{' '}
+                                            <small>
+                                                {suggestion.formattedSuggestion.secondaryText}
+                                            </small>
+                                        </div>
+                                    )
+                                    /* eslint-enable react/jsx-key */
+                                })}
+
+                            </div>
                         )}
                     </div>
+                )
+            }}
+        </PlacesAutocomplete>)
 
-                    {suggestions.length > 0 && (
-                        <div className="Demo__autocomplete-container">
-                            {suggestions.map(suggestion => {
-                                const className = "Demo"
-
-                                return (
-                                    /* eslint-disable react/jsx-key */
-                                    <div
-                                        {...getSuggestionItemProps(suggestion, { className })}
-                                    >
-                                        <strong>
-                                            {suggestion.formattedSuggestion.mainText}
-                                        </strong>{' '}
-                                        <small>
-                                            {suggestion.formattedSuggestion.secondaryText}
-                                        </small>
-                                    </div>
-                                )
-                                /* eslint-enable react/jsx-key */
-                            })}
-
-                        </div>
-                    )}
-                </div>
-            )
-        }}
-    </PlacesAutocomplete>)
-
-}
-
-renderMap = () => {
-    if (this.state.isLoaded) {
-        return (
-            <GoogleMap
-                onLoad={map => {
-                    this.map = map
-                }}
-                id="search-map"
-                mapContainerStyle={{
-                    height: "100%",
-                    width: "100%"
-                }}
-                zoom={14}
-                center={{
-                    lat: this.state.latitude !== 0 ? this.state.latitude : 1.43729,
-                    lng: this.state.longitude !== 0 ? this.state.longitude : 103.83903
-                }}
-                onClick={e => this.renderRadiusByClick(e)}
-            >
-                {this.renderRadius()}
-                {this.renderInfoMarkers()}
-
-            </GoogleMap>
-        )
-    } else {
-        return null
     }
 
-}
+    renderMap = () => {
+        if (this.state.isLoaded) {
+            return (
+                <GoogleMap
+                    onLoad={map => {
+                        this.map = map
+                    }}
+                    id="search-map"
+                    mapContainerStyle={{
+                        height: "100%",
+                        width: "100%"
+                    }}
+                    zoom={14}
+                    center={{
+                        lat: this.state.latitude !== 0 ? this.state.latitude : 1.43729,
+                        lng: this.state.longitude !== 0 ? this.state.longitude : 103.83903
+                    }}
+                    onCenterChanged={this.handleMapCenterChanged}
+                    onClick={e => this.renderRadiusByClick(e)}
+                >
+                    {this.renderRadius()}
+                    {this.renderInfoMarkers()}
+
+                </GoogleMap>
+            )
+        } else {
+            return null
+        }
+
+    }
 
 
 
-render() {
-    return (
-        <Fragment>
-            <div id="SearchMap" className="row mx-auto col-11">
+    render() {
+        return (
+            <Fragment>
+                <div id="SearchMap" className="row mx-auto col-11">
 
-                <div className="col-xl-9 embed-responsive">
-                    <div className="embed-responsive-item">
-                        {this.renderMap()}
+                    <div className="col-xl-9 embed-responsive">
+                        <div className="embed-responsive-item">
+                            {this.renderMap()}
+                        </div>
+                    </div>
+
+                    <div className="col-xl-2 ">
+
+                        <div className="searchControls">
+                            <a className="btn btn-danger btn-sm" onClick={e => { this.handleRadiusToggle(e) }}>
+                                <i className="fas fa-map-marker-alt"></i>
+                            </a>
+                            {this.renderAutoComplete()}
+                        </div>
+
+                        <div className="searchControls">
+                            <label id="radiusSlider">Radius: {this.state.radiusSize}</label>
+                            <input type="range" className="custom-range" id="customRange1" onChange={e => { this.handleRadiusSlider(e) }} min="200" max="5000" />
+                        </div>
+
+                        <div className="search-controls-datetimepicker">
+                            <p>From:</p>
+                            <DateTimePicker
+                                onChange={this.handleDateTimeFrom}
+                                value={this.state.dateFrom}
+                            />
+                            <span></span>
+                            <p>To:</p>
+                            <DateTimePicker
+                                onChange={this.handleDateTimeTo}
+                                value={this.state.dateTo}
+                            />
+                        </div>
+
+                        {this.state.loggedIn && <div className="onlyUserVideos">
+
+                            <form action="#">
+                                <p>
+                                    <label>
+                                        <input type="checkbox" checked={this.state.onlyUserVideos} onChange={this.handleOnlyUserVideos} />
+                                        <span>Show only my videos</span>
+                                    </label>
+                                </p>
+                            </form>
+                        </div>}
+
+                        <div className="searchControls">
+                            {(this.state.redirect && <Redirect push to={{
+                                pathname: '/watch/' + this.urlString
+                            }} />)}
+                            <button type="button" className="btn btn-success" onClick={this.renderRedirect}>Watch</button>
+                        </div>
+
+                        <div className="markerInfo">
+                            <div>
+                                <p>{'Address: ' + this.state.markerAddress}</p>
+                            </div>
+                            <div>
+                                <p> {'Coordinates: ' + this.state.markerLat + ', ' + this.state.markerLng}</p>
+                            </div>
+                            <div>
+                                <p> {'From: ' + this.state.markerDateFrom}</p>
+                            </div>
+                            <div>
+                                <p> {'To: ' + this.state.markerDateTo}</p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <div className="col-xl-2 ">
-
-                    <div className="searchControls">
-                        <a className="btn btn-danger btn-sm" onClick={e => { this.handleRadiusToggle(e) }}>
-                            <i className="fas fa-map-marker-alt"></i>
-                        </a>
-                        {this.renderAutoComplete()}
-                    </div>
-
-                    <div className="searchControls">
-                        <label id="radiusSlider">Radius: {this.state.radiusSize}</label>
-                        <input type="range" className="custom-range" id="customRange1" onChange={e => { this.handleRadiusSlider(e) }} min="2000" max="12000" />
-                    </div>
-
-                    <div className="search-controls-datetimepicker">
-                        <p>From:</p>
-                        <DateTimePicker
-                            onChange={this.handleDateTimeFrom}
-                            value={this.state.dateFrom}
-                        />
-                        <span></span>
-                        <p>To:</p>
-                        <DateTimePicker
-                            onChange={this.handleDateTimeTo}
-                            value={this.state.dateTo}
-                        />
-                    </div>
-
-                    {this.state.loggedIn && <div className="onlyUserVideos">
-
-                        <form action="#">
-                            <p>
-                                <label>
-                                    <input type="checkbox" checked={this.state.onlyUserVideos} onChange={this.handleOnlyUserVideos} />
-                                    <span>Show only my videos</span>
-                                </label>
-                            </p>
-                        </form>
-                    </div>}
-
-                    <div className="searchControls">
-                        {(this.state.redirect && <Redirect push to={{
-                            pathname: '/watch/' + this.urlString
-                        }} />)}
-                        <button type="button" className="btn btn-success" onClick={this.renderRedirect}>Watch</button>
-                    </div>
-
-                    <div className="markerInfo">
-                        <div>
-                            <p>{'Address: ' + this.state.markerAddress}</p>
-                        </div>
-                        <div>
-                            <p> {'Coordinates: ' + this.state.markerLat + ', ' + this.state.markerLng}</p>
-                        </div>
-                        <div>
-                            <p> {'From: ' + this.state.markerDateFrom}</p>
-                        </div>
-                        <div>
-                            <p> {'To: ' + this.state.markerDateTo}</p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-        </Fragment>
+            </Fragment>
 
 
-    )
-}
+        )
+    }
 }
 Homepage.propTypes = {
     auth: PropTypes.object.isRequired,

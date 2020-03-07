@@ -129,6 +129,13 @@ export function convertSubSearch(content) {
                 switch (count) {
                     case 1:
                         index = string
+                        if (index === '0') {
+                            tempArr.push({
+                                filename: filename,
+                                index: 'empty'
+                            })
+                            count = 0
+                        }
                         break
                     case 2:
                         timeFrom = string
@@ -188,21 +195,21 @@ export function createPath(content) {
     return pathArr
 }
 
-export function calcDirectionVector(subtitle_file) {
+export function calcDirectionVector(subtitle_file, zoom) {
     let tempArr = []
     let directionVectors = []
     subtitle_file.forEach(path => {
         path.forEach(function (data) {
-
+            let distance = zoom === 20 ? 20 : 600 - (30 * zoom)
             let index = data.timeFrom.indexOf(',')
             const leftCoords = moveTo(
                 { lat: parseFloat(data.lat), lon: parseFloat(data.lon) },
-                { distance: 50, heading: parseInt(data.direction) - 22.5 }
+                { distance: distance, heading: parseInt(data.direction) - 22.5 }
             )
 
             const rightCoords = moveTo(
                 { lat: parseFloat(data.lat), lon: parseFloat(data.lon) },
-                { distance: 50, heading: parseInt(data.direction) + 22.5 }
+                { distance: distance, heading: parseInt(data.direction) + 22.5 }
             )
 
             tempArr.push({

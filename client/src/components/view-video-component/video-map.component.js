@@ -1,4 +1,4 @@
-import React, { Fragment, PureComponent } from "react";
+import React, { Fragment, Component } from "react";
 import axios from "axios";
 import {
     GoogleMap,
@@ -10,7 +10,7 @@ import { convertSub, createPath, calcDirectionVector } from "../helper"
 const CancelToken = axios.CancelToken;
 let source;
 
-export default class VideoMap extends PureComponent {
+export default class VideoMap extends Component {
     constructor(props) {
         super(props);
 
@@ -40,14 +40,12 @@ export default class VideoMap extends PureComponent {
             cancelToken: source.token
         })
             .then(response => {
-                //console.log(response.data)
                 this.setState({ subtitle_file: convertSub(response.data) });
-
 
             }).then(() => {
                 this.setState({ map_path: createPath(this.state.subtitle_file) });
                 this.setState({
-                    directionVectors: calcDirectionVector(this.state.subtitle_file)
+                    directionVectors: calcDirectionVector(this.state.subtitle_file, 20)
                 });
             }).catch(function (thrown) {
                 if (axios.isCancel(thrown)) {
@@ -69,7 +67,6 @@ export default class VideoMap extends PureComponent {
                 return "Bounds";
             });
         });
-
 
         this.map.fitBounds(bounds);
     };
@@ -104,6 +101,16 @@ export default class VideoMap extends PureComponent {
         return index
     }
 
+    handleZoomChange = () => {
+        if (this.map !== undefined) {
+            let zoom = this.map.getZoom()
+            this.setState({
+                directionVectors: calcDirectionVector(this.state.subtitle_file, zoom)
+            });
+        }
+
+    }
+
     renderPaths = () => {
         return (this.state.map_path.map((data, index) => {
 
@@ -114,8 +121,8 @@ export default class VideoMap extends PureComponent {
                 path={data}
                 options={{
                     strokeColor: this.props.appliedColorArr[colorIndex].color,
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
+                    strokeOpacity: 1,
+                    strokeWeight: 3,
                     fillColor: this.props.appliedColorArr[colorIndex].color,
                     fillOpacity: 0.35,
                     clickable: false,
@@ -131,13 +138,12 @@ export default class VideoMap extends PureComponent {
     }
 
     renderDirectionVectors = () => {
-        //console.log(this.state.directionVectors)
         return (this.state.directionVectors.map((data, i) => {
             let notdone = true
             let colorIndex = this.findIndexOfVideo(this.state.subtitle_file[i][0].filename)
             return (data.map((coords, i) => {
-                
-          
+
+
                 if (notdone) {
                     let index = this.props.findIndexOfVideo(coords.filename, 1)
 
@@ -164,7 +170,7 @@ export default class VideoMap extends PureComponent {
                                     strokeColor: "black",
                                     strokeOpacity: 0.8,
                                     strokeWeight: 2,
-                                    fillColor:  this.props.appliedColorArr[colorIndex].color,
+                                    fillColor: this.props.appliedColorArr[colorIndex].color,
                                     fillOpacity: 1,
                                     clickable: false,
                                     draggable: false,
@@ -183,9 +189,9 @@ export default class VideoMap extends PureComponent {
                                     { lat: coords.right.lat, lng: coords.right.lng }
                                 ]}
                                 options={{
-                                    fillColor:  this.props.appliedColorArr[colorIndex].color,
+                                    fillColor: this.props.appliedColorArr[colorIndex].color,
                                     fillOpacity: 0.5,
-                                    strokeColor:  this.props.appliedColorArr[colorIndex].color,
+                                    strokeColor: this.props.appliedColorArr[colorIndex].color,
                                     strokeOpacity: 0,
                                     strokeWeight: 2,
                                     clickable: false,
@@ -207,6 +213,7 @@ export default class VideoMap extends PureComponent {
     renderMap = () => {
 
         if (this.state.isLoaded && this.state.map_path.length !== 0 && this.state.directionVectors.length !== 0) {
+
             return (
                 <Fragment>
                     <div className="embed-responsive-item">
@@ -222,7 +229,7 @@ export default class VideoMap extends PureComponent {
                                 width: "100%"
                             }}
                             zoom={11}
-
+                            onZoomChanged={this.handleZoomChange}
                         >
                             {this.renderPaths()}
                             {this.renderDirectionVectors()}

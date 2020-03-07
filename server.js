@@ -148,6 +148,28 @@ router.get('/uploads:email', (req, res) => {
 
 });
 
+router.delete('/uploads', (req, res) => {
+
+  gfs.collection('videos')
+
+  gfs.files.remove({ filename: req.query.filename }, function (err, gridStore) {
+    if (err) return handleError(err);
+  });
+
+  gfs.collection('subtitles')
+
+  gfs.files.remove({ filename: req.query.filename }, function (err, gridStore) {
+    if (err) return handleError(err);
+  });
+
+  uploads.findOneAndDelete({ email: req.query.email, filename: req.query.filename }, function (err, file) {
+
+    return res.end("File deleted");
+
+  })
+
+})
+
 router.get('/bookmarks:email', (req, res) => {
   try {
     bookmarks.find({ email: req.params.email }, function (err, bookmarks) {
@@ -343,27 +365,30 @@ router.get('/subtitle/:selectedVideos', (req, res) => {
       gfs.files.findOne({ filename: filename.substring(0, 32) }, (err, file) => {
 
         if (!file || file.length === 0) {
-          return res.status(404).json({
-            err: 'No file exists'
+          dataArr.push(filename.substring(0, 32) + '|0|')
+        } else {
+
+          const chunks = [];
+          console.log('Creating read stream for subtitle: ' + file.filename)
+          const readstream = gfs.createReadStream(file.filename);
+
+
+          readstream.on("data", function (chunk) {
+            chunks.push(chunk);
           });
+
+          readstream.on("end", function () {
+            let obj = (Buffer.concat(chunks).toString('utf8'));
+
+            dataArr.push(file.filename + '|' + obj)
+     
+            if (dataArr.length === videoArr.length) {
+              res.json(dataArr)
+            }
+
+          });
+
         }
-
-        const chunks = [];
-        console.log('Creating read stream for subtitle: ' + file.filename)
-        const readstream = gfs.createReadStream(file.filename);
-
-
-        readstream.on("data", function (chunk) {
-          chunks.push(chunk);
-        });
-
-        readstream.on("end", function () {
-          let obj = (Buffer.concat(chunks).toString('utf8'));
-
-          dataArr.push(file.filename + '|' + obj)
-          if (dataArr.length === videoArr.length)
-            res.json(dataArr)
-        });
 
       });
 

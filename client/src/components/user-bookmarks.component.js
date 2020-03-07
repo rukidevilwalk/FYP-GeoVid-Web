@@ -5,20 +5,21 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import Image from 'react-bootstrap/Image'
 import {
   Player,
   ControlBar
 } from 'video-react'
 import { convertSubSearch, convertStringToDate } from "./helper"
 import Geocode from "react-geocode"
-
+import removed_thumbnail from "../video_removed.png";
 const CancelToken = axios.CancelToken;
 let source;
 
 const VideoList = props => (
   <div className="row col-11 mx-auto justify-content-left align-items-left">
 
-    <div className="col-6" key={props.index + 1}>
+    {props.video.startDate !== '' && <div className="col-4" key={props.index + 1}>
       <Player
         videoId={"video"}
         preload={"metadata"}
@@ -31,7 +32,12 @@ const VideoList = props => (
       >
         <ControlBar autoHide={false} className="my-class" />
       </Player>
-    </div>
+    </div>}
+
+    {props.video.startDate === '' && <div className="col-6 justify-content-center" key={props.index + 1}>
+
+    <Image src={removed_thumbnail} fluid />
+    </div>}
 
     <div className="col-3" key={props.index}>
       <p><strong>Details</strong></p>
@@ -42,13 +48,13 @@ const VideoList = props => (
     </div>
 
     <div className="col-1 justify-content-center align-self-center" key={props.index + 3}>
-    <form action="#">
-    <p>
-    <label>
-        <input type="checkbox" name={props.name}  onChange={props.handleChecked} />
-        <span></span>
-      </label>
-      </p>
+      <form action="#">
+        <p>
+          <label>
+            <input type="checkbox" name={props.name} onChange={props.handleChecked} />
+            <span></span>
+          </label>
+        </p>
       </form>
     </div>
 
@@ -64,8 +70,8 @@ class UserBookmarks extends PureComponent {
       videolist: [],
       video_file: [],
       subtitle_file: [],
-      selected_videos:[],
-      url:''
+      selected_videos: [],
+      url: ''
     }
     this.handleChecked = this.handleChecked.bind(this);
   }
@@ -119,28 +125,33 @@ class UserBookmarks extends PureComponent {
               convertSubSearch(response.data).forEach(element => {
 
                 if (data.filename === element[0].filename) {
+                  if (element[0].index === 'empty') {
+                    tempArr.push({ videotitle: data.filename, videourl: '', startDate: '', endDate: '', startAddress: '', endAddress: '' })
 
-                  Geocode.fromLatLng(element[0].lat, element[0].lon).then(
-                    response => {
-                      startAddress = response.results[0].formatted_address
+                  } else {
+                    Geocode.fromLatLng(element[0].lat, element[0].lon).then(
+                      response => {
+                        startAddress = response.results[0].formatted_address
 
-                      Geocode.fromLatLng(element[element.length - 1].lat, element[element.length - 1].lon).then(
-                        response => {
-                          endAddress = response.results[0].formatted_address
+                        Geocode.fromLatLng(element[element.length - 1].lat, element[element.length - 1].lon).then(
+                          response => {
+                            endAddress = response.results[0].formatted_address
 
-                          tempArr.push({ videotitle: data.filename, videourl: "http://localhost:8000/video/" + data.filename, startDate: convertStringToDate(element[0].date), endDate: convertStringToDate(element[element.length - 1].date), startAddress: startAddress, endAddress: endAddress })
+                            tempArr.push({ videotitle: data.filename, videourl: "http://localhost:8000/video/" + data.filename, startDate: convertStringToDate(element[0].date), endDate: convertStringToDate(element[element.length - 1].date), startAddress: startAddress, endAddress: endAddress })
 
-                          if (tempArr.length === res.data.length) {
-                            this.setState({
-                              video_file: tempArr,
-                            })
-                          }
+                            if (tempArr.length === res.data.length) {
+                              this.setState({
+                                video_file: tempArr,
+                              })
+                            }
 
-                        })
+                          })
 
-                    })
+                      })
+                  }
 
                 }
+
               })
 
             })
@@ -171,7 +182,7 @@ class UserBookmarks extends PureComponent {
   handleChecked = (e) => {
     const item = e.target.name;
 
-let indexFound = this.findIndexOfVideo(item)
+    let indexFound = this.findIndexOfVideo(item)
     let tempArr = []
     let tempUrl = ''
 
@@ -183,12 +194,12 @@ let indexFound = this.findIndexOfVideo(item)
         return obj.videotitle !== item
       })
 
-  
+
 
 
     } else {
       tempArr = [...this.state.selected_videos]
-      tempArr.push({ videotitle: item})
+      tempArr.push({ videotitle: item })
 
     }
 
@@ -207,7 +218,7 @@ let indexFound = this.findIndexOfVideo(item)
       tempUrl = "/watch/" + tempUrl
 
     } else {
-tempUrl = ''
+      tempUrl = ''
     }
     this.setState({ selected_videos: tempArr })
     this.setState({ url: tempUrl })
@@ -217,12 +228,12 @@ tempUrl = ''
 
     let index = -1
 
-      this.state.selected_videos.find(function (item, i) {
-        if (item.videotitle === val) {
-          index = i
-          return i
-        }
-      })
+    this.state.selected_videos.find(function (item, i) {
+      if (item.videotitle === val) {
+        index = i
+        return i
+      }
+    })
 
     return index
   }
@@ -230,7 +241,7 @@ tempUrl = ''
   videoList = () => {
 
     return this.state.video_file.map((video, i) => {
-      return <VideoList handleChecked={this.handleChecked} name={video.videotitle} index={i} video={video}  key={i} />;
+      return <VideoList handleChecked={this.handleChecked} name={video.videotitle} index={i} video={video} key={i} />;
     });
   }
 
@@ -240,20 +251,51 @@ tempUrl = ''
     }
   }
 
+  handleDelete = () => {
+
+    var itemsProcessed = 0;
+    let email = this.props.auth.user.email
+    let tempArr = this.state.selected_videos
+    tempArr.forEach(function (file) {
+      axios.delete("http://localhost:8000/bookmarks", {
+        params:
+        {
+          email: email,
+          filename: file.videotitle
+        }
+      })
+        .then(res => {
+          itemsProcessed++
+          console.log(itemsProcessed)
+          console.log(tempArr.length)
+          if (itemsProcessed === tempArr.length)
+            window.location.reload(true);
+        })
+        .catch(err => {
+          console.log(err)
+
+        })
+    })
+
+  }
+
   render() {
     return (
       <Fragment>
         <div className="row col-11 mx-auto">
-        <div className="col-8 py-auto my-auto">
-        <h3>Bookmarks</h3>
-        </div>
-        <div className="col-2  py-auto my-auto">
-          {this.renderRedirect()}
-          <button type="button" className="btn btn-success" onClick={this.checkSelectedVideos}>Watch</button>
-        </div>
+          <div className="col-6 py-auto my-auto">
+            <h3>Bookmarks</h3>
+          </div>
+          <div className="col-2  py-auto my-auto">
+            {this.renderRedirect()}
+            <button type="button" className="btn btn-success" onClick={this.checkSelectedVideos}>Watch</button>
+          </div>
+          <div className="col-2  py-auto my-auto">
+            <button type="button" className="btn btn-success" onClick={this.handleDelete}>Delete</button>
+          </div>
         </div>
         {this.videoList()}
-  
+
       </Fragment>
 
     )

@@ -18,7 +18,7 @@ let source;
 const VideoList = props => (
   <div className="row col-11 mx-auto justify-content-left align-items-left">
 
-    <div className="col-6" key={props.index + 1}>
+    <div className="col-4" key={props.index + 1}>
       <Player
         videoId={"video"}
         preload={"metadata"}
@@ -42,13 +42,13 @@ const VideoList = props => (
     </div>
 
     <div className="col-1 justify-content-center align-self-center" key={props.index + 3}>
-    <form action="#">
-    <p>
-    <label>
-        <input type="checkbox" name={props.name}  onChange={props.handleChecked} />
-        <span></span>
-      </label>
-      </p>
+      <form action="#">
+        <p>
+          <label>
+            <input type="checkbox" name={props.name} onChange={props.handleChecked} />
+            <span></span>
+          </label>
+        </p>
       </form>
     </div>
 
@@ -64,8 +64,8 @@ class UserUploads extends PureComponent {
       videolist: [],
       video_file: [],
       subtitle_file: [],
-      selected_videos:[],
-      url:''
+      selected_videos: [],
+      url: ''
     }
     this.handleChecked = this.handleChecked.bind(this);
   }
@@ -171,7 +171,7 @@ class UserUploads extends PureComponent {
   handleChecked = (e) => {
     const item = e.target.name;
 
-let indexFound = this.findIndexOfVideo(item)
+    let indexFound = this.findIndexOfVideo(item)
     let tempArr = []
     let tempUrl = ''
 
@@ -183,12 +183,12 @@ let indexFound = this.findIndexOfVideo(item)
         return obj.videotitle !== item
       })
 
-  
+
 
 
     } else {
       tempArr = [...this.state.selected_videos]
-      tempArr.push({ videotitle: item})
+      tempArr.push({ videotitle: item })
 
     }
 
@@ -207,7 +207,7 @@ let indexFound = this.findIndexOfVideo(item)
       tempUrl = "/watch/" + tempUrl
 
     } else {
-tempUrl = ''
+      tempUrl = ''
     }
     this.setState({ selected_videos: tempArr })
     this.setState({ url: tempUrl })
@@ -217,12 +217,12 @@ tempUrl = ''
 
     let index = -1
 
-      this.state.selected_videos.find(function (item, i) {
-        if (item.videotitle === val) {
-          index = i
-          return i
-        }
-      })
+    this.state.selected_videos.find(function (item, i) {
+      if (item.videotitle === val) {
+        index = i
+        return i
+      }
+    })
 
     return index
   }
@@ -230,7 +230,7 @@ tempUrl = ''
   videoList = () => {
 
     return this.state.video_file.map((video, i) => {
-      return <VideoList handleChecked={this.handleChecked} name={video.videotitle} index={i} video={video}  key={i} />;
+      return <VideoList handleChecked={this.handleChecked} name={video.videotitle} index={i} video={video} key={i} />;
     });
   }
 
@@ -240,20 +240,54 @@ tempUrl = ''
     }
   }
 
+  handleDelete = () => {
+
+    var itemsProcessed = 0;
+    let email = this.props.auth.user.email
+    let tempArr = this.state.selected_videos
+    tempArr.forEach(function (file) {
+      axios.delete("http://localhost:8000/uploads", {
+        params:
+        {
+          email: email,
+          filename: file.videotitle
+        }
+      })
+        .then(res => {
+          itemsProcessed++
+          console.log(itemsProcessed)
+          console.log(tempArr.length)
+          if (itemsProcessed === tempArr.length)
+            window.location.reload(true);
+        })
+        .catch(err => {
+          console.log(err)
+
+        })
+    })
+
+  }
+
   render() {
     return (
       <Fragment>
         <div className="row col-11 mx-auto">
-        <div className="col-8 py-auto my-auto">
-        <h3>Uploads</h3>
-        </div>
-        <div className="col-2  py-auto my-auto">
-          {this.renderRedirect()}
-          <button type="button" className="btn btn-success" onClick={this.checkSelectedVideos}>Watch</button>
-        </div>
+
+          <div className="col-6 py-auto my-auto">
+            <h3>Uploads</h3>
+          </div>
+
+          <div className="col-2 py-auto my-auto">
+            {this.renderRedirect()}
+            <button type="button" className="btn btn-success" onClick={this.checkSelectedVideos}>Watch</button>
+          </div>
+
+          <div className="col-2 py-auto my-auto">
+            <button type="button" className="btn btn-success" onClick={this.handleDelete}>Delete</button>
+          </div>
         </div>
         {this.videoList()}
-  
+
       </Fragment>
 
     )

@@ -419,7 +419,7 @@ class ViewVideo extends PureComponent {
     return (
 
       <div>
-        <label>Current Timing: {this.state.currentTiming.toString()}</label>
+        <label><h6>Current Timing: {this.state.currentTiming.toString()}</h6></label>
         <input type="range" className="custom-range" id="customRange1" value={this.state.defaultValue} onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.state.duration} />
       </div>)
 
@@ -456,9 +456,6 @@ class ViewVideo extends PureComponent {
         <div> <label> </label></div>
         {this.renderSeekBar()}
         <div> <label> </label></div>
-
-        {/* <button type="button" className="btn btn-email" onClick={this.handleShare}><i class="fas fa-envelope"></i></button>
-        <ShareIcon/> */}
 
         <div className="Demo__some-network">
           <EmailShareButton
@@ -542,7 +539,7 @@ class ViewVideo extends PureComponent {
       <Fragment>
 
         <div className="row col-11 mx-auto">
-          <div className="ml-0 pl-0 col-10 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
+          <div className="ml-0 pl-0 col-6 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
             {this.state.appliedColorArr.length === this.state.videoArr.length && <VideoMap
               videos={this.state.videoArr}
               colorArr={this.state.colorArr}
@@ -557,11 +554,11 @@ class ViewVideo extends PureComponent {
           {this.renderVideoControls()}
         </div>
 
-        <div className="row col-11 pt-2 mx-auto justify-content-left align-items-left">
+        <div id = "videosScroll" className="row col-11 pt-2 mx-auto justify-content-left align-items-left">
           {this.state.videoInfo.map((video, index) => {
             let isBookmarked = this.findIndexOfVideo(video.filename, 3)
             let colorIndex = this.findIndexOfVideo(video.filename, 4)
-            return this.state.mapIsRendered && this.state.appliedColorArr.length === this.state.videoArr.length && <div className="pr-2 pl-0 pb-1 col-5 align-items-left" key={index}>
+            return this.state.mapIsRendered && this.state.appliedColorArr.length === this.state.videoArr.length && <div className="pr-2 pl-0 pb-1 col-4 align-items-left" key={index}>
 
               <VideoPlayer
                 key={index}
