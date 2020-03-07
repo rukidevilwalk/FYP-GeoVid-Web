@@ -47,19 +47,23 @@ export default class InfoMarker extends Component {
     }
 
     handleSelectMarker = () => {
-        if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/red-dot.png') {
-            this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
-        }
+        if (this.marker !== undefined) {
+            if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/red-dot.png') {
+                this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+            }
 
+        }
 
     }
 
     handleDeselectMarker = () => {
-        if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
-            this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
-            this.setState({
-                pathVisible: false
-            })
+        if (this.marker !== undefined) {
+            if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+                this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
+                this.setState({
+                    pathVisible: false
+                })
+            }
         }
 
     }

@@ -122,12 +122,12 @@ router.post('/upload:email', (req, res) => {
               filename: res.req.files[0].filename
             })
             newUpload.save()
-           
+
           }
           return res.end("File has been uploaded");
 
         })
- 
+
       }
     });
   } catch (error) {
@@ -202,8 +202,6 @@ router.get('/search', (req, res) => {
         });
       }
 
-
-
       files.forEach(function (file) {
         const chunks = []
         const readstream = gfs.createReadStream(file.filename)
@@ -222,6 +220,58 @@ router.get('/search', (req, res) => {
 
       })
     })
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+router.get('/search:email', (req, res) => {
+
+  try {
+    let tempUploads = []
+    uploads.find({ "email": req.params.email }, function (err, uploads) {
+
+      uploads.forEach(function (upload) {
+        tempUploads.push(upload.filename)
+      })
+    }).then(response => {
+      gfs.collection('subtitles')
+
+      let dataArr = [];
+      gfs.files.find({
+        "filename": {
+          $in: tempUploads
+        }
+      }).toArray((err, files) => {
+        console.log(tempUploads)
+        if (!files || files.length === 0) {
+          return res.status(404).json({
+            err: 'No files exist'
+          });
+        }
+        console.log(files)
+        files.forEach(function (file) {
+          const chunks = []
+          const readstream = gfs.createReadStream(file.filename)
+
+          readstream.on("data", function (chunk) {
+            chunks.push(chunk)
+          })
+
+          readstream.on("end", function () {
+            let obj = (Buffer.concat(chunks).toString('utf8'));
+
+            dataArr.push(file.filename + '|' + obj)
+
+            if (dataArr.length === files.length) {
+              res.json({ data: dataArr })
+
+            }
+          })
+        })
+      })
+    })
+
   } catch (error) {
     console.log(error)
   }

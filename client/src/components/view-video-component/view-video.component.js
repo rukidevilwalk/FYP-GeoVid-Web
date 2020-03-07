@@ -1,5 +1,5 @@
 import React, { Fragment, PureComponent } from "react"
-import VideoPlayer from "./video-player.component"
+import VideoPlayer from "./videoplayer/video-player.component"
 import VideoMap from "./video-map.component"
 import { Button } from 'reactstrap'
 import PropTypes from "prop-types";
