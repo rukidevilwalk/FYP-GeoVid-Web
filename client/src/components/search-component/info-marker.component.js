@@ -60,21 +60,25 @@ export default class InfoMarker extends Component {
         if (this.marker !== undefined) {
             if (this.marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
                 this.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
-                this.setState({
-                    pathVisible: false
-                })
+
             }
         }
 
     }
 
-    handleToggleClose = () => {
+    showPath = () => {
 
         // this.setState({
-        //     isOpen: false
+        //     pathVisible: true
         // })
     }
+    hidePath = () => {
 
+        // this.setState({
+        //     pathVisible: false
+        // })
+    }
+    
     init = (marker) => {
         this.filename = this.props.filename
         this.marker = marker
@@ -89,6 +93,8 @@ export default class InfoMarker extends Component {
                     key={this.props.index}
                     position={{ lat: this.props.lat, lng: this.props.lng }}
                     onClick={() => this.handleToggleOpen()}
+                    onMouseOver={() => this.showPath()}
+                    onMouseOut={() => this.hidePath()}
                     onLoad={marker => {
                         this.init(marker)
                     }}

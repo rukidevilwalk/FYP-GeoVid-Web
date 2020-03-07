@@ -85,7 +85,8 @@ export default class VideoPlayer extends PureComponent {
       bookmark_checked: this.props.isBookmarked,
       startTime: 0,
       showInfo: false,
-      loggedIn: false
+      loggedIn: false,
+      currentDateTime: this.props.dateTo.toString()
     }
     this.handleAdd = this.handleAdd.bind(this);
 
@@ -117,8 +118,15 @@ export default class VideoPlayer extends PureComponent {
 
 
     //Update respective map direction vector according to video's current time
-    if (parseInt(state.currentTime) > parseInt(prevState.currentTime) || (parseInt(state.currentTime) === 0 && state.hasStarted))
+    if (parseInt(state.currentTime) !== parseInt(prevState.currentTime) || (parseInt(state.currentTime) === 0 && state.hasStarted)) {
+
+      let tempTime = new Date(this.props.dateFrom)
+      tempTime.setSeconds(tempTime.getSeconds() + state.currentTime)
+      this.setState({ currentDateTime: tempTime.toString() })
       this.props.directionIndexHandler(this.state.video_file[0].videotitle.substring(0, 32), parseInt(state.currentTime))
+    }
+
+
 
   }
 
@@ -272,7 +280,7 @@ export default class VideoPlayer extends PureComponent {
         backgroundColor: this.props.color
       }
       return (
-        <div style={styles} className="pl-2 pr-0 mr-0" key={index}>
+        <div style={styles} className="pl-0 pr-0 mr-0" key={index}>
           <Player
             videoId={"video"}
             preload={"auto"}
@@ -292,6 +300,7 @@ export default class VideoPlayer extends PureComponent {
               <InfoButton order={7} />
             </ControlBar>
           </Player>
+          <span><b>Current Timing: {this.state.currentDateTime}</b></span>
           {this.renderDialog()}
         </div>
       )

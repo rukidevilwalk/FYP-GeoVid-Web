@@ -419,7 +419,7 @@ class ViewVideo extends PureComponent {
     return (
 
       <div>
-        <label><h6>Current Timing: {this.state.currentTiming.toString()}</h6></label>
+        <label><h6><b>Current Timing: {this.state.currentTiming.toString()}</b></h6></label>
         <input type="range" className="custom-range" id="customRange1" value={this.state.defaultValue} onChange={e => { this.handleSeekSlider(e) }} min="0" max={this.state.duration} />
       </div>)
 
@@ -429,7 +429,7 @@ class ViewVideo extends PureComponent {
 
     if (this.state.mapIsRendered) {
       return (<div className="col-2">
-        <div> <label>Controls </label></div>
+        <div> <label><b><h7>Controls</h7></b> </label></div>
         <div className="pb-2  btn-group" role="group">
           <button type="button" className="btn btn-secondary" onClick={this.playAll} >
             Play
@@ -539,7 +539,7 @@ class ViewVideo extends PureComponent {
       <Fragment>
 
         <div className="row col-11 mx-auto">
-          <div className="ml-0 pl-0 col-6 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
+          <div className="ml-0 pl-0 col-7 justify-content-left align-items-left embed-responsive embed-responsive-21by9">
             {this.state.appliedColorArr.length === this.state.videoArr.length && <VideoMap
               videos={this.state.videoArr}
               colorArr={this.state.colorArr}
