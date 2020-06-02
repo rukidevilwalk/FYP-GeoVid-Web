@@ -75,7 +75,7 @@ const storage = new GridFsStorage({
 
         const filename = buf.toString("hex") + path.extname(file.originalname);
 
-        if (file.mimetype == 'application/octet-stream' || filename.substring(filename.length - 3) == 'srt') {
+        if ( filename.substring(filename.length - 3) == 'srt') {
           const fileInfo = {
             filename: videoname,
             bucketName: "subtitles"
