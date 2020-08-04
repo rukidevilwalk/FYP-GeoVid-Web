@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route} from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
@@ -36,24 +36,22 @@ if (localStorage.jwtToken) {
   }
 }
 
-function App(){
-    return (
-      <Provider store={store}>
-        <Router>
-          <div className="App">
-            <Navbar />
+const App = () => (
+  <Provider store={store}>
+    <Router>
+      <div className="App">
+        <Navbar />
 
-            <Route path="/watch/:id" component={WatchVideo} />
-            <Route exact path="/" component={SearchVideo} />
-            <Route exact path="/upload" component={UploadVideo} />
-            <Route exact path="/register" component={Register} />
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/uploads" component={UserUploads} />
-            <Route exact path="/bookmarks" component={UserBookmarks} />
-          </div>
-        </Router>
-      </Provider>
-    );
-}
+        <Route path="/watch/:id" component={WatchVideo} />
+        <Route exact path="/" component={SearchVideo} />
+        <Route exact path="/upload" component={UploadVideo} />
+        <Route exact path="/register" component={Register} />
+        <Route exact path="/login" component={Login} />
+        <Route exact path="/uploads" component={UserUploads} />
+        <Route exact path="/bookmarks" component={UserBookmarks} />
+      </div>
+    </Router>
+  </Provider>
+)
 
 export default App;
