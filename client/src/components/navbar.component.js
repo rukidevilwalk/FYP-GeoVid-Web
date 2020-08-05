@@ -16,8 +16,6 @@ const Navbar = (props) => {
 
         if (props.auth.isAuthenticated)
             setLoggedIn(true)
-
-        console.log('useEffect[]')
     }, []);
 
     const isFirstRun = useRef(true);
@@ -34,7 +32,6 @@ const Navbar = (props) => {
         } else {
             setLoggedIn(false)
         }
-        console.log('isAuthenticated[]')
     }, [props.auth.isAuthenticated]);
 
     useEffect(() => {
@@ -47,7 +44,6 @@ const Navbar = (props) => {
         if (props.errors) {
             setErrors(props.errors)
         }
-        console.log('errors[]')
     }, [props.errors]);
 
 
