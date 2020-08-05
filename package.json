@@ -4,9 +4,9 @@
 	"description": "",
 	"main": "server.js",
 	"scripts": {
-		"server": "nodemon server.js",
+		"server": "nodemon server.tsx",
 		"client": "npm start --prefix client",
-		"db": "concurrently \"mongod \"  \"mongo \"",
+		"db": "concurrently \"mongod --dbpath \"D:\\data\" \"  \"mongo \"",
 		"dev": "concurrently \"cd client && npm run start \" \"npm run server\" ",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
@@ -15,6 +15,10 @@
 	"license": "ISC",
 	"dependencies": {
 		"@react-google-maps/api": "^1.7.6",
+		"@types/jest": "^26.0.8",
+		"@types/node": "^14.0.27",
+		"@types/react": "^16.9.44",
+		"@types/react-dom": "^16.9.8",
 		"axios": "^0.19.2",
 		"bcryptjs": "^2.4.3",
 		"body-parser": "^1.19.0",
@@ -54,6 +58,7 @@
 		"redux": "^4.0.5",
 		"redux-devtools-extension": "^2.13.8",
 		"redux-thunk": "^2.3.0",
+		"typescript": "^3.9.7",
 		"validator": "^12.2.0",
 		"video.js": "^7.6.5"
 	}

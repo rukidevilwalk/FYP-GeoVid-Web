@@ -9,7 +9,7 @@ const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
 Grid.mongo = mongoose.mongo;
-const crypto = require('crypto');
+const crypto_module = require('crypto');
 const router = express.Router();
 const morgan = require('morgan');
 const passport = require("passport");
@@ -68,14 +68,14 @@ const storage = new GridFsStorage({
 
 
     return new Promise((resolve, reject) => {
-      crypto.randomBytes(16, (err, buf) => {
+      crypto_module.randomBytes(16, (err, buf) => {
         if (err) {
           return reject(err);
         }
 
         const filename = buf.toString("hex") + path.extname(file.originalname);
 
-        if ( filename.substring(filename.length - 3) == 'srt') {
+        if (filename.substring(filename.length - 3) == 'srt') {
           const fileInfo = {
             filename: videoname,
             bucketName: "subtitles"
@@ -117,7 +117,7 @@ router.post('/upload:email', (req, res) => {
       } else {
         uploads.find({ email: req.params.email, filename: res.req.files[0].filename }, function (err, file) {
           if (!file || file.length === 0) {
-            newUpload = new uploads({
+            const newUpload = new uploads({
               email: req.params.email,
               filename: res.req.files[0].filename
             })
@@ -153,13 +153,13 @@ router.delete('/uploads', (req, res) => {
   gfs.collection('videos')
 
   gfs.files.remove({ filename: req.query.filename }, function (err, gridStore) {
-    if (err) return handleError(err);
+    return res.end(err);
   });
 
   gfs.collection('subtitles')
 
   gfs.files.remove({ filename: req.query.filename }, function (err, gridStore) {
-    if (err) return handleError(err);
+    return res.end(err);
   });
 
   uploads.findOneAndDelete({ email: req.query.email, filename: req.query.filename }, function (err, file) {
@@ -188,7 +188,7 @@ router.post('/bookmarks', (req, res) => {
   bookmarks.find({ email: req.body.email, filename: req.body.filename }, function (err, file) {
     if (!file || file.length === 0) {
 
-      newBookmark = new bookmarks({
+      const newBookmark = new bookmarks({
         email: req.body.email,
         filename: req.body.filename
       })
@@ -381,7 +381,7 @@ router.get('/subtitle/:selectedVideos', (req, res) => {
             let obj = (Buffer.concat(chunks).toString('utf8'));
 
             dataArr.push(file.filename + '|' + obj)
-     
+
             if (dataArr.length === videoArr.length) {
               res.json(dataArr)
             }
