@@ -59,7 +59,7 @@
 		"redux-devtools-extension": "^2.13.8",
 		"redux-thunk": "^2.3.0",
 		"typescript": "^3.9.7",
-		"validator": "^12.2.0",
+		"validator": "^13.7.0",
 		"video.js": "^7.6.5"
 	}
 }
